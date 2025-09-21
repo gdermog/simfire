@@ -1,10 +1,10 @@
 //****************************************************************************************************
-//*! \file main.cpp                                                                                  *
-//*! Module contains entrypoint for ...                                                              *
+//! \file main.cpp                                                                                  
+//! Module contains entrypoint for ...                                                              
 //****************************************************************************************************
-//*                                                                                                  *
+//                                                                                                  
 //****************************************************************************************************
-//* 19. 11. 2025, V. Pospíšil, gdermog@seznam.cz                                                     *
+// 19. 11. 2025, V. Pospíšil, gdermog@seznam.cz                                                     
 //****************************************************************************************************
 
 #include <iostream>
@@ -14,6 +14,7 @@
 #include <SimFireGlobals.h>
 #include <CSimFireConfig.h>
 #include <CSimFireSettings.h>
+#include <CSimFireCore.h>
 
 //******* Command line help **************************************************************************
 
@@ -108,5 +109,19 @@ int main( int argc, char * argv[] )
   std::cout << asteriskLine << std::endl << std::endl;
   settings.Preprint( std::cout );
   std::cout << std::endl << std::endl;
+
+  //------ Create and run the simulation -----------------------------------------------------------
+
+  SimFire::CSimFireCore simCore( settings );
+
+  auto res = simCore.Run();
+
+  if( 0 != res )
+  {
+    std::cerr << "Simulation ended in error(s), check log file '" 
+              << simCore.GetLogFilePath() << "'" << std::endl << std::endl;
+  } // if
+
+  return res;
 
 } // main 

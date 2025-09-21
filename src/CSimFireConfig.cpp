@@ -1,6 +1,6 @@
 //****************************************************************************************************
-//*! \file CSimFireConfig.cpp                                                                        *
-//*! Module contains definitions of CSimFireConfig class, declared in CSimFireConfig.h, which ...    *
+//! \file CSimFireConfig.cpp                                                                        *
+//! Module contains definitions of CSimFireConfig class, declared in CSimFireConfig.h, which ...    *
 //****************************************************************************************************
 //*                                                                                                  *
 //****************************************************************************************************

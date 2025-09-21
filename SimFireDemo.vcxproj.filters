@@ -16,9 +16,51 @@
     <Filter Include="data">
       <UniqueIdentifier>{382decd6-495e-473c-a8b3-3bc1b1e30cc1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="entt">
+      <UniqueIdentifier>{24ff015e-81c5-405c-95d5-28409ec5a5f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\config">
+      <UniqueIdentifier>{2e8fc4c1-88ca-4df6-bc45-7c703d463b81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\container">
+      <UniqueIdentifier>{74c27aaf-510f-456b-a185-9feceb1f09b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\core">
+      <UniqueIdentifier>{46614486-1451-4446-bc46-24293b51efa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\entity">
+      <UniqueIdentifier>{aee4f550-6276-4a11-9698-e3d67e3dfdb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\graph">
+      <UniqueIdentifier>{178144b8-8a34-456e-9dd4-ad5ac103542f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\locator">
+      <UniqueIdentifier>{9360bc57-ad1f-4345-9746-3cafc5a8ecbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\meta">
+      <UniqueIdentifier>{9f00512f-a0c2-4ae9-b8f4-be4e08e6ed76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\natvis">
+      <UniqueIdentifier>{f719c9ed-8213-498f-bdca-455806836882}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\poly">
+      <UniqueIdentifier>{a88889a6-db48-44bd-9d28-2240d3b1b7b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\process">
+      <UniqueIdentifier>{b2b41180-9800-4563-8976-8f00e19b3943}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\resource">
+      <UniqueIdentifier>{7fb5f56c-df24-42a4-9c19-758c2f734520}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\signal">
+      <UniqueIdentifier>{c459dd57-6540-4a70-a4d0-2ed09b03d55c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entt\tools">
+      <UniqueIdentifier>{a2c0de17-7936-4285-9457-e292211d5fe7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp">
+    <ClCompile Include="src\SImFireMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\CSimFireSettings.cpp">
@@ -28,6 +70,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SimFireStringTools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CSimFireCore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CSimFireSingleRun.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CSimFireSingleRunParams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,10 +95,285 @@
     <ClInclude Include="src\SimFireStringTools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="entt\config\config.h">
+      <Filter>entt\config</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\config\macro.h">
+      <Filter>entt\config</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\config\version.h">
+      <Filter>entt\config</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\container\dense_map.hpp">
+      <Filter>entt\container</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\container\dense_set.hpp">
+      <Filter>entt\container</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\container\fwd.hpp">
+      <Filter>entt\container</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\container\table.hpp">
+      <Filter>entt\container</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\algorithm.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\any.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\attribute.h">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\bit.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\compressed_pair.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\enum.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\family.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\fwd.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\hashed_string.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\ident.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\iterator.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\memory.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\monostate.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\ranges.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\tuple.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\type_info.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\type_traits.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\core\utility.hpp">
+      <Filter>entt\core</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\component.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\entity.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\fwd.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\group.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\handle.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\helper.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\mixin.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\organizer.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\ranges.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\registry.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\runtime_view.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\snapshot.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\sparse_set.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\storage.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entity\view.hpp">
+      <Filter>entt\entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\graph\adjacency_matrix.hpp">
+      <Filter>entt\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\graph\dot.hpp">
+      <Filter>entt\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\graph\flow.hpp">
+      <Filter>entt\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\graph\fwd.hpp">
+      <Filter>entt\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\locator\locator.hpp">
+      <Filter>entt\locator</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\adl_pointer.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\container.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\context.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\factory.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\fwd.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\meta.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\node.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\pointer.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\policy.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\range.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\resolve.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\template.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\type_traits.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\meta\utility.hpp">
+      <Filter>entt\meta</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\poly\fwd.hpp">
+      <Filter>entt\poly</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\poly\poly.hpp">
+      <Filter>entt\poly</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\process\fwd.hpp">
+      <Filter>entt\process</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\process\process.hpp">
+      <Filter>entt\process</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\process\scheduler.hpp">
+      <Filter>entt\process</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\resource\cache.hpp">
+      <Filter>entt\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\resource\fwd.hpp">
+      <Filter>entt\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\resource\loader.hpp">
+      <Filter>entt\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\resource\resource.hpp">
+      <Filter>entt\resource</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\signal\delegate.hpp">
+      <Filter>entt\signal</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\signal\dispatcher.hpp">
+      <Filter>entt\signal</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\signal\emitter.hpp">
+      <Filter>entt\signal</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\signal\fwd.hpp">
+      <Filter>entt\signal</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\signal\sigh.hpp">
+      <Filter>entt\signal</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\tools\davey.hpp">
+      <Filter>entt\tools</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\entt.hpp">
+      <Filter>entt</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\fwd.hpp">
+      <Filter>entt</Filter>
+    </ClInclude>
+    <ClInclude Include="entt\tools.hpp">
+      <Filter>entt</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CSimFireCore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CSimFireSingleRun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CSimFireSingleRunParams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\sim_test.ini">
       <Filter>data</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="entt\natvis\config.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\container.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\core.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\entity.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\graph.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\locator.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\meta.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\poly.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\process.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\resource.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
+    <Natvis Include="entt\natvis\signal.natvis">
+      <Filter>entt\natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

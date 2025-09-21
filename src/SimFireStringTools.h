@@ -1,6 +1,6 @@
 //****************************************************************************************************
-//*! \file SimFireStringTools.h                                                                      *
-//*! Module contains convenient function for working with c-strings and std::string objects          *
+//! \file SimFireStringTools.h                                                                      *
+//! Module contains convenient function for working with c-strings and std::string objects          *
 //****************************************************************************************************
 //*                                                                                                  *
 //****************************************************************************************************

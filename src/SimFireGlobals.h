@@ -1,10 +1,10 @@
 //****************************************************************************************************
-//*! \file SimFireGlobals.h                                                                          *
-//*! Module contains ...                                                                             *
+//! \file SimFireGlobals.h                                                                          
+//! Module contains ...                                                                             
 //****************************************************************************************************
-//*                                                                                                  *
+//                                                                                                  
 //****************************************************************************************************
-//* 19. 11. 2025, V. Pospíšil, gdermog@seznam.cz                                                     *
+// 19. 11. 2025, V. Pospíšil, gdermog@seznam.cz                                                     
 //****************************************************************************************************
 
 #ifndef H_SimFireGlobals
@@ -46,6 +46,7 @@ namespace SimFire
     kComplexNumeric     = 0x0040,
   };
 
+  inline bool IsZero( double_t val, double_t tol = 1e-12 ) { return ( ( -tol < val ) && ( val < tol ) ); }
 
   constexpr unsigned gPrintoutIdWidth = 20;
   //!< 

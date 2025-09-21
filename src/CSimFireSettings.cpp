@@ -1,16 +1,16 @@
 //****************************************************************************************************
-//*! \file CSimFireSettings.cpp                                                                        *
-//*! Module contains definitions of CSimFireSettings class, declared in CSimFireSettings.h, which ...    *
+//! \file CSimFireSettings.cpp                                                                       
+//! Module contains definitions of CSimFireSettings class, declared in CSimFireSettings.h, which
+//! contains all parameters entered  by the user from outside.                                    
 //****************************************************************************************************
-//*                                                                                                  *
+//                                                                                                  
 //****************************************************************************************************
-//* 19. 11. 2025, V. Pospíšil, gdermog@seznam.cz                                                     *
+// 19. 11. 2025, V. Pospíšil, gdermog@seznam.cz                                                     
 //****************************************************************************************************
 
 #include <iomanip>
 
 #include <CSimFireSettings.h>
-
 #include <SimFireStringTools.h>
 
 namespace SimFire
@@ -60,6 +60,8 @@ namespace SimFire
        mGunZ = inCfg.GetValueDouble( "gun", "z", 0.0 );
        mVelocity = inCfg.GetValueDouble( "gun", "velocity", 0.0 );
        mCd = inCfg.GetValueDouble( "gun", "cd", 0.0 );
+       mMass = inCfg.GetValueDouble( "gun", "mass", 0.0 );
+       mBulletSize = inCfg.GetValueDouble( "gun", "size", 0.0 );
 
        mTgtX = inCfg.GetValueDouble( "target", "x", 0.0 );
        mTgtY = inCfg.GetValueDouble( "target", "y", 0.0 );
@@ -105,6 +107,8 @@ namespace SimFire
      PrpLine( out ) << "GunZ" << mGunZ << " m" << std::endl;
      PrpLine( out ) << "Velocity" << mVelocity << " m/s" << std::endl;
      PrpLine( out ) << "Cd" << mCd << std::endl << std::endl;
+     PrpLine( out ) << "Mass" << mMass << std::endl;
+     PrpLine( out ) << "BulletSize" << mBulletSize << " m" << std::endl << std::endl; 
 
      PrpLine( out ) << "TgtX" << mTgtX << " m" << std::endl;
      PrpLine( out ) << "TgtY" << mTgtY << " m" << std::endl;
