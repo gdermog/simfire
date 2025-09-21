@@ -1,0 +1,18 @@
+{
+  "FileVersion": 2,
+  "Id": "3d22b1df-3f3c-45dd-bac4-02bf430cc632",
+  "Items": [
+    {
+      "Id": "f2318c3b-a699-4396-96ea-aef05388094c",
+      "Command": "--oxo 13"
+    },
+    {
+      "Id": "2abd9cfe-3efa-4f71-bf5e-9b09de846a1d",
+      "Command": "--help"
+    },
+    {
+      "Id": "0e322d0e-927b-4f1e-a86d-2f6bab602d5e",
+      "Command": "--setup \"w:\\\\Demos\\\\simfire\\\\data\\\\sim_test.ini\""
+    }
+  ]
+}
