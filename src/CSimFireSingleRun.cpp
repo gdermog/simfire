@@ -13,6 +13,19 @@
 namespace SimFire
 {
 
+  const char * CSimFireSingleRun::mBulletIdString = "BULLET";
+
+  const char * CSimFireSingleRun::mTargetIdString = "TARGET";
+
+  //****** component: entity full identifier *********************************************************
+
+  struct cpId {
+    uint64_t id;        //!< Full entity identifier (index)
+    const char * typeId;//!< Type identifier (for logging and debugging purposes)
+    bool active;        //!< \b true if the entity is active (still in simulation). Simulation continues  
+                        //!  if at least one entity is active.
+  };
+
   //****** component: position ***********************************************************************
 
   struct cpPosition {
@@ -68,9 +81,9 @@ namespace SimFire
       } );
 
     } // procURM::update
-  }; 
+  }; // procURM
 
-  //****** processor: change in speed according to acceleration **************************************
+  //****** processor: change in speed according to gravitational acceleration ************************
 
   struct procDVA {
 
@@ -78,7 +91,7 @@ namespace SimFire
       mDtg( dt * g )
     {}
 
-    double_t mDtg;       //!< Time step * Gravitational acceleration [m/s]
+    double_t mDtg;       //!< Time step * Gravitational acceleration (Z axis) [m/s]
 
     void update( entt::registry & reg )
     {
@@ -90,7 +103,85 @@ namespace SimFire
       } );
 
     } // procDVA::update
-  };
+  }; // procDVA
+
+  //****** processor: object collision check *********************************************************
+
+  struct procOCC {
+
+    void update( entt::registry & reg )
+    {
+      auto view = reg.view<const cpId, const cpPosition, const cpGeometry>();
+
+      using iterator_t = decltype( view.begin() );
+      iterator_t i = view.begin();
+      iterator_t j = view.end();
+
+      if( view.begin() == view.end() )
+      {
+        return;
+      }
+
+      if( i == j )
+      {
+        return;
+      }
+
+    } // procOCS::update
+
+  }; // procOCC
+
+  //****** processor: out of scene check *************************************************************
+
+  struct procOCS {
+
+    void update( entt::registry & reg )
+    {
+      auto view = reg.view<cpId, cpPosition>();
+
+      view.each( [=]( auto & id, const auto & pos )
+      {
+        if( id.active )
+          return;
+
+        if( pos.Z <= 0.0 )
+          id.active = false;
+
+      });
+
+    } // procOCS::update
+
+  }; // procOCS
+
+  //****** processor: check activity *****************************************************************
+
+  struct procActCheck {
+
+    procActCheck():
+      mAnythingActive( false )
+    {}
+
+    bool mAnythingActive; 
+                        //!< The simulation should continue if at least one entity is active (true here).
+
+    void reset()
+    {
+      mAnythingActive = false;
+    }
+
+    void update( entt::registry & reg )
+    {
+      auto view = reg.view<cpId>();
+
+      view.each( [&]( const auto & v )
+      {
+        if( v.active )
+          mAnythingActive = true;
+      });
+
+    } // procActCheck::update
+
+  }; // procActCheck
 
   //****** CCSimFireSingleRun ************************************************************************
 
@@ -101,9 +192,7 @@ namespace SimFire
     mLogCallback( fnCall ),
     mRunId(),
     mEnTTRegistry()
-  {
-
-  } /* CSimFireSingleRun::CSimFireSingleRun */
+  {} 
 
 
   //-------------------------------------------------------------------------------------------------
@@ -122,6 +211,13 @@ namespace SimFire
     //------ Bullet entity creation ----------------------------------------------------------------
 
     const auto bullet = mEnTTRegistry.create();
+
+    mEnTTRegistry.emplace<cpId>(
+      bullet,
+      1,
+      mBulletIdString,
+      true );           // Bullet is active at the beginning of the simulation. As we have single bullet in the
+                        // simulation, its index is for now hardcoded as 1.
 
     mEnTTRegistry.emplace<cpPosition>( 
       bullet,
@@ -162,9 +258,18 @@ namespace SimFire
       mSettings.GetCd() );
                         // Mass and drag coefficient are given by user setup
 
+
     //------ Target entity creation ----------------------------------------------------------------
 
     const auto target = mEnTTRegistry.create();
+
+    mEnTTRegistry.emplace<cpId>(
+      target,
+      1000,
+      mTargetIdString,
+      false );          // Target is not active from the beginning of the simulation as its state is not 
+                        // significant for continuing the simulation. Because we have target bullet in 
+                        // the simulation, its index is hardcoded as 1000.
 
     mEnTTRegistry.emplace<cpPosition>(
       target,

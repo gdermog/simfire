@@ -68,6 +68,10 @@ namespace SimFire
 
     entt::registry mEnTTRegistry;
 
+    static const char * mBulletIdString;
+
+    static const char * mTargetIdString;
+
     //@}
 
   }; // CSimFireSingleRun
