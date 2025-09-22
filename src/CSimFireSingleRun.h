@@ -35,7 +35,7 @@ namespace SimFire
     using LogCallback_t = std::function <void( const std::string &, const std::string & )>;
     //!< This is a type of a method that responds to a journal message request.
 
-#define BIND_SINGLE_RUN_LOG_CALLBACK( fnName ) std::bind( &fnName, this, std::placeholders::_1 )
+#define BIND_SINGLE_RUN_LOG_CALLBACK( fnName ) std::bind( &fnName, this, std::placeholders::_1, std::placeholders::_2 )
     //!< This macro allows one to specify a member function of other class as a logging callback.
 
     //------------------------------------------------------------------------------------------------

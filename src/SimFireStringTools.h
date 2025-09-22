@@ -98,6 +98,55 @@ namespace SimFire
   std::string JoinStrings( const StrVect_t & elements, const char * glue );
   /*!< \brief Spojí řetězecový vektor do jednoho řetězce. Pro pospojování použije zadané znaky. */
 
+  //****************************************************************************************************
+
+  inline char format_argument_typecast( char value ) noexcept { return value; }
+
+  inline int8_t format_argument_typecast( int8_t value ) noexcept { return value; }
+  inline int16_t format_argument_typecast( int16_t value ) noexcept { return value; }
+  inline int32_t format_argument_typecast( int32_t value ) noexcept { return value; }
+  inline int64_t format_argument_typecast( int64_t value ) noexcept { return value; }
+  inline uint8_t format_argument_typecast( uint8_t value ) noexcept { return value; }
+  inline uint16_t format_argument_typecast( uint16_t value ) noexcept { return value; }
+  inline uint32_t format_argument_typecast( uint32_t value ) noexcept { return value; }
+  inline uint64_t format_argument_typecast( uint64_t value ) noexcept { return value; }
+  inline float_t format_argument_typecast( float_t value ) noexcept { return value; }
+  inline double_t format_argument_typecast( double_t value ) noexcept { return value; }
+  inline bool format_argument_typecast( bool value ) noexcept { return value; }
+
+  inline long format_argument_typecast( long value ) noexcept { return value; }
+  inline unsigned long format_argument_typecast( unsigned long value ) noexcept { return value; }
+
+  inline const char * format_argument_typecast( const char * value ) noexcept { return value; }
+  inline const wchar_t * format_argument_typecast( const wchar_t * value ) noexcept { return value; }
+
+  inline char * format_argument_typecast( char * value ) noexcept { return value; }
+  inline wchar_t * format_argument_typecast( wchar_t * value ) noexcept { return value; }
+
+  template<std::size_t N>
+  inline const char * format_argument_typecast( const char( &value )[N] ) noexcept { return (const char *)&value; }
+
+  inline const char * format_argument_typecast( std::string const & value ) noexcept { return value.c_str(); }
+
+  inline const wchar_t * format_argument_typecast( std::wstring const & value ) noexcept { return value.c_str(); }
+
+  template <typename T>
+  inline const char * format_argument_typecast( const T & value ) noexcept { return value; }
+
+  template<typename... Args>
+  std::string FormatStr( const std::string & format, const Args&... args )
+  {
+    size_t size = snprintf( nullptr, 0, format.c_str(), format_argument_typecast( args )... ) + 1;
+    // Spočítá se výsledná délka a přidá místo navíc pro terminátor
+
+    std::unique_ptr<char[]> buf( new char[size] );
+    snprintf( buf.get(), size, format.c_str(), format_argument_typecast( args )... );
+    // Teď už ale terminátor v řetězci nechceme
+
+    return std::string( buf.get(), buf.get() + size - 1 );
+  } /*FormatStr*/
+
+
 } // namespace SimFire
 
 #endif

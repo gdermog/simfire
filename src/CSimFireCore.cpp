@@ -30,7 +30,19 @@ namespace SimFire
 
    int CSimFireCore::Run()
    {
-     return -1;
+
+     CSimFireSingleRun testRun( 
+       mSettings,
+       BIND_SINGLE_RUN_LOG_CALLBACK( CSimFireCore::WriteLogMessage ) );
+
+     CSimFireSingleRunParams runParams;
+     runParams.mRunIdentifier = "MyFirstRun";
+     runParams.mVelocityXCoef = 1.0;
+     runParams.mVelocityYCoef = 0.0;
+     runParams.mVelocityZCoef = 1.0;
+
+     return testRun.Run( runParams );
+
    } // CSimFireCore::Run
 
    //-------------------------------------------------------------------------------------------------
