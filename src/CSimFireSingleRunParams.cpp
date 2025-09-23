@@ -18,7 +18,13 @@ namespace SimFire
 
    //****** CCSimFireSingleRunParams **************************************************************************
 
-   CSimFireSingleRunParams::CSimFireSingleRunParams()
+   CSimFireSingleRunParams::CSimFireSingleRunParams():
+     mRunIdentifier(),
+     mVelocityXCoef( 1.0 ),
+     mVelocityYCoef( 0.0 ),
+     mVelocityZCoef( 1.0 ),
+     mReturnCode( SimResCode_t::kUnknown ),
+     mMinDistanceToTarget( -1.0 )
    {
 
    } /* CSimFireSingleRunParams::CSimFireSingleRunParams */

@@ -31,6 +31,17 @@ namespace SimFire
 
   public:
 
+    enum class SimResCode_t: uint16_t
+    {
+      kUnknown          = 0,    //!< Unknown result
+      kNotStarted       = 1,    //!< Simulation not started
+      kRunning          = 2,    //!< Simulation running
+      kEndedNoActive    = 3,    //!< Simulation ended: no active objects left in the scene
+      kEndedCollision   = 4,    //!< Simulation ended: collision detected
+      kEndedMaxTicks    = 5,    //!< Simulation ended: maximum number of ticks reached
+      kError            = 100   //!< Simulation ended with error
+    };
+
     //------------------------------------------------------------------------------------------------
     //! @name Constructors, destructor, clonning, assign operators                                   
     //@{----------------------------------------------------------------------------------------------
@@ -54,6 +65,9 @@ namespace SimFire
     double_t mVelocityXCoef;     //!< X aim of the shooter
     double_t mVelocityYCoef;     //!< Y aim of the shooter
     double_t mVelocityZCoef;     //!< Z aim of the shooter
+
+    SimResCode_t mReturnCode;
+    double_t mMinDistanceToTarget;
 
   protected:
 

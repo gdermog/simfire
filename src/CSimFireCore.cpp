@@ -7,6 +7,8 @@
 // 19. 11. 2025, V. Pospíšil, gdermog@seznam.cz                                                     
 //****************************************************************************************************
 
+#include <thread>
+
 #include <CSimFireCore.h>
 
 namespace SimFire
@@ -31,17 +33,34 @@ namespace SimFire
    int CSimFireCore::Run()
    {
 
-     CSimFireSingleRun testRun( 
-       mSettings,
-       BIND_SINGLE_RUN_LOG_CALLBACK( CSimFireCore::WriteLogMessage ) );
+     //------- Preparing threads and workers for parallel simulations --------------------------------
 
-     CSimFireSingleRunParams runParams;
-     runParams.mRunIdentifier = "MyFirstRun";
-     runParams.mVelocityXCoef = 1.0;
-     runParams.mVelocityYCoef = 0.0;
-     runParams.mVelocityZCoef = 1.0;
+     auto nrOfRuns = mSettings.GetRunsInGeneration();
+     ListOfRunDescriptors_t vRunParams( nrOfRuns, {} );
+                        // Run parameters is preset for whole generation 
 
-     return testRun.Run( runParams );
+     uint32_t nThreads = ( mSettings.GetNumberOfThreads() > 0 ) ?
+       static_cast<uint32_t>( mSettings.GetNumberOfThreads() ) :
+       std::max( 1u, std::thread::hardware_concurrency() );
+
+     std::vector<std::future<void>> vRunFutures;
+
+     auto bPars = vRunParams.begin();
+     auto ePars = vRunParams.begin();
+     while( 0 < nrOfRuns )
+     {             
+       auto nThisBatch = std::min( static_cast<uint32_t>( nrOfRuns ), nThreads );
+       std::advance( ePars, nThisBatch );
+       vRunFutures.emplace_back( std::async( std::launch::async, [&] { RunBunch( bPars, ePars ); }) );
+       nrOfRuns -= nThisBatch;
+     } // while
+     
+     for( auto & task : vRunFutures )
+     {                  // Wait for all simulation tasks to complete
+       task.wait();
+     } // for
+
+
 
    } // CSimFireCore::Run
 
@@ -62,6 +81,29 @@ namespace SimFire
      static std::string dummy( "NOT YET KNOWN" );
      return dummy;
    } // CSimFireCore::GetLogFilePath
+
+   //-------------------------------------------------------------------------------------------------
+
+   void CSimFireCore::RunBunch(
+     ListOfRunDescriptors_t::iterator runParamsBegin,
+     ListOfRunDescriptors_t::iterator runParamsEnd )
+   {
+
+     for( auto it = runParamsBegin; it != runParamsEnd; ++it )
+       it->mReturnCode = CSimFireSingleRunParams::SimResCode_t::kNotStarted;
+
+     CSimFireSingleRun runWorker( mSettings, BIND_SINGLE_RUN_LOG_CALLBACK( CSimFireCore::WriteLogMessage ) );
+
+     for( auto it = runParamsBegin; it != runParamsEnd; ++it )
+     {
+
+
+
+     }
+
+
+     return;
+   }
 
    //-------------------------------------------------------------------------------------------------
 

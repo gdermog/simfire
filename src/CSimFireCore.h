@@ -10,7 +10,7 @@
 #ifndef H_CSimFireCore
 #define H_CSimFireCore
 
-#include <iostream>
+#include <future>
 #include <mutex>
 
 #include <CSimFireSettings.h>
@@ -56,6 +56,17 @@ namespace SimFire
     //@{----------------------------------------------------------------------------------------------
 
   protected:
+
+    using ListOfRunDescriptors_t = std::vector<CSimFireSingleRunParams>;
+                        //!< List of run parameters for whole generation
+
+    using ListOfRunResults_t = std::vector<std::pair<int32_t, double_t>>;
+                        //!< List of results of all runs in one generation (pair of run result code and 
+                        //!  minimal distance to target)
+
+    void RunBunch(
+      ListOfRunDescriptors_t::iterator runParamsBegin,
+      ListOfRunDescriptors_t::iterator runParamsEnd );
 
     const CSimFireSettings & mSettings;
 

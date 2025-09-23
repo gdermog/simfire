@@ -19,7 +19,25 @@ namespace SimFire
    //****** CCSimFireSettings **************************************************************************
 
    CSimFireSettings::CSimFireSettings():
-     mSimIdentifier( "SimFire")
+     mSimIdentifier( "SimFire"),
+     mGunX( 0.0 ),
+     mGunY( 0.0 ),
+     mGunZ( 0.0 ),
+     mVelocity( 0.0 ),
+     mCd( 0.0 ),
+     mMass( 0.0 ),
+     mBulletSize( 0.0 ),
+     mTgtX( 0.0 ),
+     mTgtY( 0.0 ),
+     mTgtZ( 0.0 ),
+     mTgtSize( 0.0 ),
+     mg( 9.81 ),
+     mDensity( 1.225 ),
+     mdt( 0.01 ),
+     mOutFile( "SimFire%sLog.txt" ),
+     mLogInterval( 0.1 ),
+     mNumberOfThreads( -1 ),
+     mRunsInGeneration( 25 )
    {
 
    } /* CSimFireSettings::CSimFireSettings */
