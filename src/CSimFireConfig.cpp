@@ -282,6 +282,27 @@ namespace SimFire
 
    //-------------------------------------------------------------------------------------------------
 
+   int64_t CSimFireConfig::GetValueInteger(
+     const std::string & inSect, 
+     const std::string & inItem, 
+     int64_t inDefault ) const
+   {
+     return 0;
+   }
+
+   //-------------------------------------------------------------------------------------------------
+
+
+   uint64_t CSimFireConfig::GetValueUnsigned( 
+     const std::string & inSect,
+     const std::string & inItem, 
+     uint64_t inDefault ) const
+   {
+     return 0;
+   }
+
+   //-------------------------------------------------------------------------------------------------
+
    bool CSimFireConfig::ParseINIKeyValuePair( 
      const std::string & inLine, const std::string & actSection )
    {

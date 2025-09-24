@@ -61,13 +61,21 @@ namespace SimFire
     //@{----------------------------------------------------------------------------------------------
 
     std::string mRunIdentifier;  //!< Simulation run identifier
+    std::string mThreadIdentifier;//!< Identifier of the thread that processed this run
 
     double_t mVelocityXCoef;     //!< X aim of the shooter
     double_t mVelocityYCoef;     //!< Y aim of the shooter
     double_t mVelocityZCoef;     //!< Z aim of the shooter
 
+    //@}----------------------------------------------------------------------------------------------
+    //! @name Public output data                                                                            
+    //@{----------------------------------------------------------------------------------------------
+
+    double_t mMinDTgtSq;//!< Minimal distance of the bullet to the target in the last completed run squared [m^2]
+    double_t mMinTime;  //!< Time when the minimal distance was reached in the last completed run [s]
+    bool mNearHalfPlane;//!< \b true if the bullet passed target in half-plane containing the shooter
+
     SimResCode_t mReturnCode;
-    double_t mMinDistanceToTarget;
 
   protected:
 

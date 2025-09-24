@@ -65,6 +65,16 @@ namespace SimFire
       const std::string & inItem,
       double_t  inDefault = 0.0 ) const;
 
+    int64_t GetValueInteger(
+      const std::string & inSect,
+      const std::string & inItem,
+      int64_t  inDefault = 0 ) const;
+
+    uint64_t GetValueUnsigned(
+      const std::string & inSect,
+      const std::string & inItem,
+      uint64_t  inDefault = 0 ) const;
+
   protected:
 
     //@{}---------------------------------------------------------------------------------------------

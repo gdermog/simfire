@@ -45,7 +45,7 @@ namespace SimFire
    //! @name Public methods  */
    //@{-----------------------------------------------------------------------------------------------
 
-    int Run();
+    bool Run();
 
     void WriteLogMessage( const std::string & id, const std::string & mssg );
 
@@ -66,7 +66,8 @@ namespace SimFire
 
     void RunBunch(
       ListOfRunDescriptors_t::iterator runParamsBegin,
-      ListOfRunDescriptors_t::iterator runParamsEnd );
+      ListOfRunDescriptors_t::iterator runParamsEnd,
+      const std::string & threadId );
 
     const CSimFireSettings & mSettings;
 

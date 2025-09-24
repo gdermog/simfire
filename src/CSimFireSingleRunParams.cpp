@@ -24,7 +24,9 @@ namespace SimFire
      mVelocityYCoef( 0.0 ),
      mVelocityZCoef( 1.0 ),
      mReturnCode( SimResCode_t::kUnknown ),
-     mMinDistanceToTarget( -1.0 )
+     mMinDTgtSq( 1e99 ),
+     mMinTime( 0.0 ),
+     mNearHalfPlane( false )
    {
 
    } /* CSimFireSingleRunParams::CSimFireSingleRunParams */

@@ -44,7 +44,7 @@ namespace SimFire
     void Preprint( std::ostream & out = std::cout );
 
     //@{}---------------------------------------------------------------------------------------------
-    //! @name Public data getters                                                                            
+    //! @name Input data getters                                                                            
     //@{----------------------------------------------------------------------------------------------
 
     const std::string & GetSimIdentifier() const { return mSimIdentifier; }
@@ -104,11 +104,10 @@ namespace SimFire
     uint32_t GetRunsInGeneration() const { return mRunsInGeneration; }
     //!< \brief Returns number of runs in one generation (genetic algorithm)
 
-
   protected:
 
-    //@{}---------------------------------------------------------------------------------------------
-    //! @name Protected data                                                                            
+    //@}----------------------------------------------------------------------------------------------
+    //! @name Protected input data                                                                            
     //@{----------------------------------------------------------------------------------------------
 
     std::string mSimIdentifier;
@@ -142,6 +141,7 @@ namespace SimFire
 
     uint32_t mRunsInGeneration;
                         //!< Number of runs in one generation (for genetic algorithms)
+
 
     std::ostream & PrpLine( std::ostream & out );
 

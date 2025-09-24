@@ -36,7 +36,7 @@ namespace SimFire
      mdt( 0.01 ),
      mOutFile( "SimFire%sLog.txt" ),
      mLogInterval( 0.1 ),
-     mNumberOfThreads( -1 ),
+     mNumberOfThreads( 8 ),
      mRunsInGeneration( 25 )
    {
 
@@ -90,10 +90,11 @@ namespace SimFire
        mDensity = inCfg.GetValueDouble( "environment", "density", 0.0 );
 
        mdt = inCfg.GetValueDouble( "simulation", "dt", 0.0 );
+       mRunsInGeneration = (uint32_t)inCfg.GetValueInteger( "simulation", "generation", 0.0 );
+       mNumberOfThreads = (int32_t)inCfg.GetValueUnsigned( "simulation", "threads", 0.0 );
 
        mOutFile = inCfg.GetValueStr( "logging", "outfile", "" );
        mLogInterval = inCfg.GetValueDouble( "logging", "interval", 0.0 );
-
      }
      catch( std::exception & e )
      {

@@ -112,9 +112,7 @@ namespace SimFire
   struct procOCC {
 
     void reset()
-    {
-      mCollidedPairs.clear();
-    }
+    {}
 
     std::vector<std::pair<entt::entity, entt::entity>> mCollidedPairs;
                         //!< List of pairs of entities that collided in the last update.
@@ -128,7 +126,7 @@ namespace SimFire
       // would have to be added to quickly determine which groups of objects can't collide at all (based 
       // on spatial grid, distances, flight levels, something like that).
 
-      auto view = reg.view<const cpPosition, const cpGeometry>();
+      auto view = reg.view<cpPosition, cpGeometry>();
       std::vector<entt::entity> entities;
 
       view.each( [&entities]( entt::entity entity, const auto & pos, const auto & geom ) 
@@ -237,7 +235,7 @@ namespace SimFire
 
   //-------------------------------------------------------------------------------------------------
 
-  int CSimFireSingleRun::Run( const CSimFireSingleRunParams & runParams )
+  int CSimFireSingleRun::Run( CSimFireSingleRunParams & runParams )
   {
     mRunId = runParams.mRunIdentifier;
 
@@ -337,6 +335,37 @@ namespace SimFire
     uint64_t maxTicks = /**//**//**/1000000000/**//**//**/;
     double_t actSimTime = 0.0;
 
+    //------ Half-space plane description ------------------------------------------------------------
+
+    // A half-space plane is a plane that divides the scene into two halves. It passes through the target 
+    // and is perpendicular to the line connecting the target and the shooter. It helps determine where 
+    // the bullet missed the target (too short or overshot). Plane description is in the form:
+    //
+    //   n1 * x + n2 * y + n3 * z + d = 0
+    //
+    // where n is normal vector (shooter to target) and d is a constant.
+
+
+    auto viewPos = mEnTTRegistry.view<cpPosition>();
+    auto targetPos = viewPos.get<cpPosition>( target );
+
+    cpPosition nVect{ 
+      mSettings.GetGunX() - targetPos.X, 
+      mSettings.GetGunY() - targetPos.Y,
+      mSettings.GetGunZ() - targetPos.Z };
+                        // Half-space plane normal vector (not normalized, but it does not matter)
+
+    double_t dConst = - ( nVect.X * targetPos.X + nVect.Y * targetPos.Y + nVect.Z * targetPos.Z );
+                        // Half-space plane constant
+
+    double referenceVal = nVect.X * mSettings.GetGunX() +  nVect.Y * mSettings.GetGunY() +  nVect.Z * mSettings.GetGunZ() + dConst;
+    bool referenceValueNegative = ( referenceVal < 0.0 );
+                        // Value of the half-plane equation at the shooter position. Bullet in specific position
+                        // is in the same half-plane as the shooter if the value of the half-plane equation
+                        // at the bullet position has the same sign as this reference value.
+
+    //------ Main simulation loop --------------------------------------------------------------------
+
     while( !( noActiveObjects || collisionDetected ) )
     {
       uniformRectilinearMotionProcessor.reset();
@@ -358,22 +387,51 @@ namespace SimFire
 
       collisionDetected = !objectCollisionCheckProcessor.mCollidedPairs.empty();
 
-      ++actualTick;
+      //------ Specific calculation for the bullet and target --------------------------------------------
+
+      auto bulletPos = viewPos.get<cpPosition>( target );
+
+      double_t distX = bulletPos.X - targetPos.X;
+      double_t distY = bulletPos.Y - targetPos.Y;
+      double_t distZ = bulletPos.Z - targetPos.Z;
+      double tgtToBulletDistSq = distX * distX + distY * distY + distZ * distZ;
+
+      if( tgtToBulletDistSq < runParams.mMinDTgtSq )
+      {                 // New minimal distance of the bullet to the target found. It must
+                        // be stored and short/overshot status of the bullet must be determined.
+
+        runParams.mMinDTgtSq = tgtToBulletDistSq;
+        runParams.mMinTime = actSimTime;
+                        // New minimal distance of the bullet and the time of the event is stored.
+
+        double bRefVal = nVect.X * bulletPos.X + nVect.Y * bulletPos.Y + nVect.Z * bulletPos.Z + dConst;
+        runParams.mNearHalfPlane = ( referenceValueNegative ? ( bRefVal < 0.0 ) : ( bRefVal > 0.0 ) );
+                        // Bullet is in the same half-plane as the shooter if the value of the half-space 
+                        // plane equation at the bullet position has the same sign as the reference value.
+
+      } // if
+
+      //------ Time increment and logging -------------------------------------------------------------
+
       if( nullptr != mLogCallback && 0 < logTicks && 0 == ( actualTick % logTicks ) )
       {
 
         auto view = mEnTTRegistry.view<const cpId, const cpPosition, const cpVelocity>();
         auto [id, pos, vel] = view.get<const cpId, const cpPosition, const cpVelocity>( bullet );
 
-        std::string mssg = FormatStr( "In t = %.4f: Bullet pos = [%.3f, %.3f, %.3f], v = [%.3f, %.3f, %.3f], active = %s",
+        double bRefVal = nVect.X * pos.X + nVect.Y * pos.Y + nVect.Z * pos.Z + dConst;
+        bool nearHalfPlane = ( referenceValueNegative ? ( bRefVal < 0.0 ) : ( bRefVal > 0.0 ) );
+
+        std::string mssg = FormatStr( "In t = %.4f: Bullet pos = [%.3f, %.3f, %.3f], v = [%.3f, %.3f, %.3f], %s",
           actSimTime,
           pos.X, pos.Y, pos.Z,
           vel.vX, vel.vY, vel.vZ,
-          ( id.active ? "true" : "false" ) );
+          ( nearHalfPlane ? "near" : "far" ) );
 
-        mLogCallback( mRunId, mssg );
+        mLogCallback( runParams.mThreadIdentifier + ":" + mRunId, mssg);
       } // if
 
+      ++actualTick;
       if( actualTick >= maxTicks )
         break;
 

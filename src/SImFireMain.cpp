@@ -116,7 +116,7 @@ int main( int argc, char * argv[] )
 
   auto res = simCore.Run();
 
-  if( 0 != res )
+  if( ! res )
   {
     std::cerr << "Simulation ended in error(s), check log file '" 
               << simCore.GetLogFilePath() << "'" << std::endl << std::endl;

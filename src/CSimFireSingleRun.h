@@ -52,7 +52,7 @@ namespace SimFire
     //! @name Public methods  */
     //@{-----------------------------------------------------------------------------------------------
 
-    int Run( const CSimFireSingleRunParams & runParams );
+    int Run( CSimFireSingleRunParams & runParams );
 
     //@{}---------------------------------------------------------------------------------------------
     //! @name Public data                                                                            
@@ -65,6 +65,8 @@ namespace SimFire
     LogCallback_t mLogCallback;
 
     std::string mRunId;
+
+    std::string mThreadId;
 
     entt::registry mEnTTRegistry;
 
