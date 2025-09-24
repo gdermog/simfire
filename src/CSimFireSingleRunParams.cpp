@@ -26,7 +26,9 @@ namespace SimFire
      mReturnCode( SimResCode_t::kUnknown ),
      mMinDTgtSq( 1e99 ),
      mMinTime( 0.0 ),
-     mNearHalfPlane( false )
+     mSimTime( 0.0 ),
+     mNearHalfPlane( false ),
+     mLowHalfPlane( false )
    {
 
    } /* CSimFireSingleRunParams::CSimFireSingleRunParams */
@@ -54,6 +56,33 @@ namespace SimFire
      PrpLine( out ) << "VelocityZCoef" << mVelocityZCoef << std::endl << std::endl;
 
    } // CSimFireSingleRunParams::Preprint
+
+   //-------------------------------------------------------------------------------------------------
+
+   const std::string & CSimFireSingleRunParams::GetStrValue( SimResCode_t code )
+   {
+
+     static const std::string lUnknown( "Unknown" );
+     static const std::string lNotStarted( "NotStarted" );
+     static const std::string lRunning( "Running" );
+     static const std::string lEndedNoActive( "EndedNoActive" );
+     static const std::string lEndedCollision( "EndedCollision" );
+     static const std::string lEndedMaxTicks( "EndedMaxTicks" );
+     static const std::string lError( "Error" );
+     static const std::string lInvalidCode( "InvalidCode" );
+
+     switch( code )
+     {
+       case SimResCode_t::kUnknown:          return lUnknown;
+       case SimResCode_t::kNotStarted:       return lNotStarted;
+       case SimResCode_t::kRunning:          return lRunning;
+       case SimResCode_t::kEndedNoActive:    return lEndedNoActive;
+       case SimResCode_t::kEndedCollision:   return lEndedCollision;
+       case SimResCode_t::kEndedMaxTicks:    return lEndedMaxTicks;
+       case SimResCode_t::kError:            return lError;
+       default:                              return lInvalidCode;
+     } // switch
+   } // GetStrValue
 
 
 } // namespace PEGLDPCgenerator

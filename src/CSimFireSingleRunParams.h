@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include <CSimFireConfig.h>
+#include <string>
 
 namespace SimFire
 {
@@ -56,6 +57,8 @@ namespace SimFire
 
     void Preprint( std::ostream & out = std::cout );
 
+    static const std::string & GetStrValue( SimResCode_t code );
+
     //@{}---------------------------------------------------------------------------------------------
     //! @name Public data                                                                            
     //@{----------------------------------------------------------------------------------------------
@@ -74,7 +77,9 @@ namespace SimFire
     double_t mMinDTgtSq;//!< Minimal distance of the bullet to the target in the last completed run squared [m^2]
     double_t mMinTime;  //!< Time when the minimal distance was reached in the last completed run [s]
     bool mNearHalfPlane;//!< \b true if the bullet passed target in half-plane containing the shooter
+    bool mLowHalfPlane; //!< \b true if the bullet passed under the target
 
+    double_t mSimTime;  //!< Total simulation time [s]
     SimResCode_t mReturnCode;
 
   protected:

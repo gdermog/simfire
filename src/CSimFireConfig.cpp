@@ -287,8 +287,20 @@ namespace SimFire
      const std::string & inItem, 
      int64_t inDefault ) const
    {
-     return 0;
-   }
+     auto strVal = GetValueStr( inSect, inItem, {} );
+
+     if( strVal.empty() )
+       return inDefault;
+
+     auto strValType = IsNumeric( strVal.c_str() );
+
+     if( NumberType_t::kIndexNumeric == strValType ||
+         NumberType_t::kIntegerNumeric == strValType ||
+         NumberType_t::kHexaNumeric == strValType )
+       return std::stoll( strVal, nullptr, 0 );
+
+     return inDefault;
+   } // CSimFireConfig::GetValueInteger
 
    //-------------------------------------------------------------------------------------------------
 
@@ -298,8 +310,20 @@ namespace SimFire
      const std::string & inItem, 
      uint64_t inDefault ) const
    {
-     return 0;
-   }
+     auto strVal = GetValueStr( inSect, inItem, {} );
+
+     if( strVal.empty() )
+       return inDefault;
+
+     auto strValType = IsNumeric( strVal.c_str() );
+
+     if( NumberType_t::kIndexNumeric == strValType ||
+         NumberType_t::kIntegerNumeric == strValType ||
+         NumberType_t::kHexaNumeric == strValType )
+       return std::stoull( strVal, nullptr, 0 );
+
+     return inDefault;
+   } // CSimFireConfig::GetValueUnsigned
 
    //-------------------------------------------------------------------------------------------------
 

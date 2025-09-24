@@ -155,7 +155,6 @@ namespace SimFire
             mCollidedPairs.emplace_back( std::make_pair( entities[i], entities[j] ) );
           } // if
 
-          // Váš kód pro zpracování dvojice
         } // for
       } // for
 
@@ -240,9 +239,9 @@ namespace SimFire
     mRunId = runParams.mRunIdentifier;
 
     mEnTTRegistry.clear();
-                        // Setup from previous run, if any, is cleared
+    // Setup from previous run, if any, is cleared
 
-    //------ Bullet entity creation ----------------------------------------------------------------
+//------ Bullet entity creation ----------------------------------------------------------------
 
     const auto bullet = mEnTTRegistry.create();
 
@@ -253,16 +252,16 @@ namespace SimFire
       true );           // Bullet is active at the beginning of the simulation. As we have single bullet in the
                         // simulation, its index is for now hardcoded as 1.
 
-    mEnTTRegistry.emplace<cpPosition>( 
+    mEnTTRegistry.emplace<cpPosition>(
       bullet,
       mSettings.GetGunX(),
-      mSettings.GetGunY(), 
+      mSettings.GetGunY(),
       mSettings.GetGunZ() );
                         // Shooter position is given by user setup
 
     double_t div = std::sqrt( runParams.mVelocityXCoef * runParams.mVelocityXCoef +
-                              runParams.mVelocityYCoef * runParams.mVelocityYCoef +
-                              runParams.mVelocityZCoef * runParams.mVelocityZCoef );
+      runParams.mVelocityYCoef * runParams.mVelocityYCoef +
+      runParams.mVelocityZCoef * runParams.mVelocityZCoef );
     if( IsZero( div ) )
     {
       if( mLogCallback )
@@ -272,9 +271,9 @@ namespace SimFire
 
     double velCoef = mSettings.GetVelocity() / div;
     mEnTTRegistry.emplace<cpVelocity>(
-      bullet, 
-      runParams.mVelocityXCoef * velCoef, 
-      runParams.mVelocityYCoef * velCoef, 
+      bullet,
+      runParams.mVelocityXCoef * velCoef,
+      runParams.mVelocityYCoef * velCoef,
       runParams.mVelocityZCoef * velCoef );
                         // Size of muzzle velocity is given by user setup, its direction, however, 
                         // is given by run parameters (we are looking for right angle to hit the target)
@@ -291,7 +290,7 @@ namespace SimFire
                         // Mass and drag coefficient are given by user setup
 
 
-    //------ Target entity creation ----------------------------------------------------------------
+//------ Target entity creation ----------------------------------------------------------------
 
     const auto target = mEnTTRegistry.create();
 
@@ -321,7 +320,7 @@ namespace SimFire
     bool collisionDetected = false;
                         // Collision of bullet and target detected
 
-    //------ Main simulation loop --------------------------------------------------------------------
+//------ Main simulation loop --------------------------------------------------------------------
 
     procURM uniformRectilinearMotionProcessor( mSettings.GetDt() );
     procDVA deltaVelocityAccelerationProcessor( mSettings.GetDt(), mSettings.GetG() );
@@ -349,22 +348,27 @@ namespace SimFire
     auto viewPos = mEnTTRegistry.view<cpPosition>();
     auto targetPos = viewPos.get<cpPosition>( target );
 
-    cpPosition nVect{ 
-      mSettings.GetGunX() - targetPos.X, 
+    cpPosition nVectNear{
+      mSettings.GetGunX() - targetPos.X,
       mSettings.GetGunY() - targetPos.Y,
       mSettings.GetGunZ() - targetPos.Z };
                         // Half-space plane normal vector (not normalized, but it does not matter)
 
-    double_t dConst = - ( nVect.X * targetPos.X + nVect.Y * targetPos.Y + nVect.Z * targetPos.Z );
+    double_t dConstNear = -( nVectNear.X * targetPos.X + nVectNear.Y * targetPos.Y + nVectNear.Z * targetPos.Z );
                         // Half-space plane constant
 
-    double referenceVal = nVect.X * mSettings.GetGunX() +  nVect.Y * mSettings.GetGunY() +  nVect.Z * mSettings.GetGunZ() + dConst;
-    bool referenceValueNegative = ( referenceVal < 0.0 );
+    double referenceValNear = nVectNear.X * mSettings.GetGunX() + nVectNear.Y * mSettings.GetGunY() + nVectNear.Z * mSettings.GetGunZ() + dConstNear;
+    bool referenceValueNearNegative = ( referenceValNear < 0.0 );
                         // Value of the half-plane equation at the shooter position. Bullet in specific position
                         // is in the same half-plane as the shooter if the value of the half-plane equation
                         // at the bullet position has the same sign as this reference value.
 
-    //------ Main simulation loop --------------------------------------------------------------------
+    // Next important half-space plane is the horizontal one passing through the target. It helps
+    // determine where the bullet was flying around target in vertical direction. This condition is given 
+    // by Z coordinate of the bullet and target, so no plane description is necessary.
+
+
+//------ Main simulation loop --------------------------------------------------------------------
 
     while( !( noActiveObjects || collisionDetected ) )
     {
@@ -387,9 +391,13 @@ namespace SimFire
 
       collisionDetected = !objectCollisionCheckProcessor.mCollidedPairs.empty();
 
-      //------ Specific calculation for the bullet and target --------------------------------------------
+      //------ Time increment ------------------------------------------------------------------------
 
-      auto bulletPos = viewPos.get<cpPosition>( target );
+      actSimTime += dt;
+
+      //------ Specific calculation for the bullet and target ----------------------------------------
+
+      auto bulletPos = viewPos.get<cpPosition>( bullet );
 
       double_t distX = bulletPos.X - targetPos.X;
       double_t distY = bulletPos.Y - targetPos.Y;
@@ -404,14 +412,19 @@ namespace SimFire
         runParams.mMinTime = actSimTime;
                         // New minimal distance of the bullet and the time of the event is stored.
 
-        double bRefVal = nVect.X * bulletPos.X + nVect.Y * bulletPos.Y + nVect.Z * bulletPos.Z + dConst;
-        runParams.mNearHalfPlane = ( referenceValueNegative ? ( bRefVal < 0.0 ) : ( bRefVal > 0.0 ) );
+        double bRefVal = nVectNear.X * bulletPos.X + nVectNear.Y * bulletPos.Y + nVectNear.Z * bulletPos.Z + dConstNear;
+        runParams.mNearHalfPlane = ( referenceValueNearNegative ? ( bRefVal < 0.0 ) : ( bRefVal > 0.0 ) );
                         // Bullet is in the same half-plane as the shooter if the value of the half-space 
                         // plane equation at the bullet position has the same sign as the reference value.
 
+        runParams.mLowHalfPlane = bulletPos.Z < targetPos.Z;
+                        // Bullet is in the under the target if its Z coordinate is lower than the target 
+                        // Z coordinate.
+
       } // if
 
-      //------ Time increment and logging -------------------------------------------------------------
+      //------ Tick increment and logging ------------------------------------------------------------
+
 
       if( nullptr != mLogCallback && 0 < logTicks && 0 == ( actualTick % logTicks ) )
       {
@@ -419,35 +432,46 @@ namespace SimFire
         auto view = mEnTTRegistry.view<const cpId, const cpPosition, const cpVelocity>();
         auto [id, pos, vel] = view.get<const cpId, const cpPosition, const cpVelocity>( bullet );
 
-        double bRefVal = nVect.X * pos.X + nVect.Y * pos.Y + nVect.Z * pos.Z + dConst;
-        bool nearHalfPlane = ( referenceValueNegative ? ( bRefVal < 0.0 ) : ( bRefVal > 0.0 ) );
+        double bRefVal = nVectNear.X * pos.X + nVectNear.Y * pos.Y + nVectNear.Z * pos.Z + dConstNear;
+        bool nearHalfPlane = ( referenceValueNearNegative ? ( bRefVal < 0.0 ) : ( bRefVal > 0.0 ) );
 
-        std::string mssg = FormatStr( "In t = %.4f: Bullet pos = [%.3f, %.3f, %.3f], v = [%.3f, %.3f, %.3f], %s",
+        std::string mssg = FormatStr( "In t = %.4f: Bullet pos = [%.3f, %.3f, %.3f], v = [%.3f, %.3f, %.3f], %s, %s",
           actSimTime,
           pos.X, pos.Y, pos.Z,
           vel.vX, vel.vY, vel.vZ,
-          ( nearHalfPlane ? "near" : "far" ) );
+          ( nearHalfPlane ? "near" : "far" ),
+          ( pos.Z < targetPos.Z ? "under" : "above" ) );
 
-        mLogCallback( runParams.mThreadIdentifier + ":" + mRunId, mssg);
+        mLogCallback( runParams.mThreadIdentifier + ":" + mRunId, mssg );
       } // if
 
       ++actualTick;
       if( actualTick >= maxTicks )
         break;
 
-      actSimTime += dt;
-
     } // while
 
-    if( nullptr != mLogCallback )
+    runParams.mSimTime = actSimTime;
+
+    if( noActiveObjects )
     {
-      if( noActiveObjects )
+      runParams.mReturnCode = CSimFireSingleRunParams::SimResCode_t::kEndedNoActive;
+      if( nullptr != mLogCallback )
         mLogCallback( mRunId, "Simulation ended: no active objects left in the scene." );
-      else if( collisionDetected )
+    }
+    else if( collisionDetected )
+    {
+      runParams.mReturnCode = CSimFireSingleRunParams::SimResCode_t::kEndedCollision;
+      if( nullptr != mLogCallback )
         mLogCallback( mRunId, "Simulation ended: collision detected." );
-      else
+    }
+    else
+    {
+      runParams.mReturnCode = CSimFireSingleRunParams::SimResCode_t::kEndedMaxTicks;
+      if( nullptr != mLogCallback )
         mLogCallback( mRunId, "Simulation ended: maximum number of ticks reached." );
-    } // if
+    }
+
 
     return 0;
 

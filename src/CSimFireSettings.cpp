@@ -137,7 +137,9 @@ namespace SimFire
      PrpLine( out ) << "g" << mg << " m/s^2" << std::endl;
      PrpLine( out ) << "Density" << mDensity << " kg/m^3" <<  std::endl << std::endl;
 
-     PrpLine( out ) << "dt" << mdt << " s" << std::endl << std::endl;
+     PrpLine( out ) << "dt" << mdt << " s" << std::endl;
+     PrpLine( out ) << "RunsInGeneration" << mRunsInGeneration << std::endl;
+     PrpLine( out ) << "NumberOfThreads" << mNumberOfThreads << std::endl << std::endl;
 
      PrpLine( out ) << "OutFile" << mOutFile << std::endl;
      PrpLine( out ) << "LogInterval" << mLogInterval << " s" << std::endl << std::endl;
