@@ -69,6 +69,12 @@ namespace SimFire
       ListOfRunDescriptors_t::iterator runParamsEnd,
       const std::string & threadId );
 
+    void GenerateInitialGeneration( ListOfRunDescriptors_t & runParams );
+
+    void GenerateFollowingGeneration( ListOfRunDescriptors_t & runParams );
+
+    bool ContinueNextGAIteration( const ListOfRunDescriptors_t & runParams );
+
     const CSimFireSettings & mSettings;
 
     std::recursive_mutex mLogMutex;

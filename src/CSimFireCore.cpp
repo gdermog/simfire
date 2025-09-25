@@ -33,6 +33,10 @@ namespace SimFire
 
    bool CSimFireCore::Run()
    {
+     if( mSettings.GetSeed() < 0 )
+       std::srand( std::time( {} ) );
+     else
+       std::srand( mSettings.GetSeed() );
 
      //------- Preparing threads and workers for parallel simulations --------------------------------
 
@@ -96,86 +100,63 @@ namespace SimFire
      } // for
 
 
+     //------- Main GA loop ------------------------------------------------------------------------------
 
+     bool gaContinue = true;
+     GenerateInitialGeneration( vRunParams );
 
-
-
-
-
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
-/* Initial generation preparation                             */
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
-     std::srand( 1 ); 
-     unsigned idx = 0;
-     for( auto & item : vRunParams )
+     do
      {
-       item.mRunIdentifier = FormatStr( "RUN_%02u", ++idx );
-       item.mVelocityXCoef = (double_t)rand() / (double_t)RAND_MAX;
-       item.mVelocityYCoef = (double_t)rand() / (double_t)RAND_MAX;
-       item.mVelocityZCoef = (double_t)rand() / (double_t)RAND_MAX;
-     }
-/**//**//**//**//**//**//**//**/
-
-
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
-/*  GA loop start                                             */
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
-
-     for( size_t thrdIdx = 0; thrdIdx < nThreads; ++thrdIdx )
-     {
-       WriteLogMessage( "CORE",
-         FormatStr( "Creating thread %s to process runs #%zu to #%zu",
-           vRunThreadIds[thrdIdx], firstItem, lastItem - 1 ) );
-
-       vRunFutures[thrdIdx] = std::async( std::launch::async, [=] {
-         RunBunch( vRunParamsPerThreadBunch[thrdIdx].first, vRunParamsPerThreadBunch[thrdIdx].second, vRunThreadIds[thrdIdx] );
-       } );
-
-       firstItem = lastItem;
-
-     } // for
-
-     for( auto & task : vRunFutures )
-     {                  // Wait for all simulation tasks to complete
-       task.wait();
-     } // for
-
-     for( auto & item : vRunParams )
-     {
-       if( item.mReturnCode != CSimFireSingleRunParams::SimResCode_t::kEndedCollision )
+       for( size_t thrdIdx = 0; thrdIdx < nThreads; ++thrdIdx )
        {
          WriteLogMessage( "CORE",
-           FormatStr( "Run %s ended with code %s after %.2f s, min. distance to target was %.3f m, %s, %s, in t = %.2f s",
-             item.mRunIdentifier,
-             CSimFireSingleRunParams::GetStrValue( item.mReturnCode ),
-             item.mSimTime,
-             std::sqrt( item.mMinDTgtSq ),
-             item.mNearHalfPlane ? "near" : "far",
-             item.mLowHalfPlane ? "under" : "above",
-             item.mMinTime ) );
-       } // if
-       else
+           FormatStr( "Creating thread %s to process runs #%zu to #%zu",
+             vRunThreadIds[thrdIdx], firstItem, lastItem - 1 ) );
+
+         vRunFutures[thrdIdx] = std::async( std::launch::async, [=] {
+           RunBunch( vRunParamsPerThreadBunch[thrdIdx].first, vRunParamsPerThreadBunch[thrdIdx].second, vRunThreadIds[thrdIdx] );
+           } );
+
+         firstItem = lastItem;
+
+       } // for
+
+       for( auto & task : vRunFutures )
+       {                // Wait for all simulation tasks to complete
+         task.wait();
+       } // for
+
+       for( auto & item : vRunParams )
        {
-         WriteLogMessage( "CORE",
-           FormatStr( "Run %s ended with code %s after %.2f s, the target was HIT in  t = %.2f s!",
-             item.mRunIdentifier,
-             CSimFireSingleRunParams::GetStrValue( item.mReturnCode ),
-             item.mSimTime,
-             item.mMinTime ) );
-       } // else
-     } // for
+         if( item.mReturnCode != CSimFireSingleRunParams::SimResCode_t::kEndedCollision )
+         {
+           WriteLogMessage( "CORE",
+             FormatStr( "Run %s ended with code %s after %.2f s, min. distance to target was %.3f m, %s, %s, in t = %.2f s",
+               item.mRunIdentifier,
+               CSimFireSingleRunParams::GetStrValue( item.mReturnCode ),
+               item.mSimTime,
+               std::sqrt( item.mMinDTgtSq ),
+               item.mNearHalfPlane ? "near" : "far",
+               item.mLowHalfPlane ? "under" : "above",
+               item.mMinTime ) );
+         } // if
+         else
+         {
+           WriteLogMessage( "CORE",
+             FormatStr( "Run %s ended with code %s after %.2f s, the target was HIT in  t = %.2f s!",
+               item.mRunIdentifier,
+               CSimFireSingleRunParams::GetStrValue( item.mReturnCode ),
+               item.mSimTime,
+               item.mMinTime ) );
+         } // else
+       } // for
 
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
-/*  GA loop - check condition for break                       */
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+       gaContinue = true; // ContinueNextGAIteration( vRunParams );
 
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
-/*  GA loop - create next generation                          */
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+       if( gaContinue )
+         GenerateFollowingGeneration( vRunParams );
 
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
-/*  GA loop end                                               */
-/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+     } while( /*gaContinue*/ false );
 
      return true;
 
@@ -231,6 +212,82 @@ namespace SimFire
      } // for
 
    } // CSimFireCore::RunBunch
+
+   //-------------------------------------------------------------------------------------------------
+
+   void CSimFireCore::GenerateInitialGeneration( ListOfRunDescriptors_t & runParams )
+   {
+
+     double_t distX = mSettings.GetTgtX() - mSettings.GetGunX();
+     double_t distY = mSettings.GetTgtY() - mSettings.GetGunY();
+     double_t distZ = mSettings.GetTgtZ() - mSettings.GetGunZ();
+                        // Vector of LOS from gunner to target
+
+     distZ *= 2.0;      // Initial elevation angle is twice the angle to the target.
+                        // BUllet spray (bunches) will be constructed around it.
+   
+     double xyRatio = 0.1;
+     double zRatio = 0.25;
+
+      for( auto & item : runParams )
+      {
+        item.mRunIdentifier.clear();
+        item.mVelocityXCoef = distX * ( 1.0 + ( (double_t)rand() / (double_t)RAND_MAX - 0.5 ) * xyRatio );
+        item.mVelocityYCoef = distY * ( 1.0 + ( (double_t)rand() / (double_t)RAND_MAX - 0.5 ) * xyRatio );
+        item.mVelocityZCoef = distZ * ( 1.0 + ( (double_t)rand() / (double_t)RAND_MAX - 0.5 ) * zRatio );
+                          // Initial velocity direction coefficients are generated as random values around
+                          // the LOS vector to the target.
+
+        item.mMinDTgtSq = std::numeric_limits<double_t>::max();
+        item.mMinTime = 0.0;
+        item.mNearHalfPlane = false;
+        item.mLowHalfPlane = false;
+        item.mSimTime = 0.0;
+        item.mReturnCode = CSimFireSingleRunParams::SimResCode_t::kNotStarted;
+      } // for
+
+   } // CSimFireCore::GenerateInitialGeneration
+
+   //-------------------------------------------------------------------------------------------------
+
+   void CSimFireCore::GenerateFollowingGeneration( ListOfRunDescriptors_t & runParams )
+   {
+
+     std::map<double_t, ListOfRunDescriptors_t> nearAbove;
+     std::map<double_t, ListOfRunDescriptors_t> nearBelow;
+     std::map<double_t, ListOfRunDescriptors_t> farAbove;
+     std::map<double_t, ListOfRunDescriptors_t> farBelow;
+
+     for( auto it = runParams.begin(); it != runParams.end(); ++it )
+     {                  // Sorts results into categories for further processing and copies them, so
+                        // original buch can be overwritten by new generation.
+       if( it->mReturnCode == CSimFireSingleRunParams::SimResCode_t::kEndedCollision )
+         continue;
+       if( it->mNearHalfPlane )
+       {
+         if( it->mLowHalfPlane )
+           nearBelow[it->mMinDTgtSq].push_back( *it );
+         else
+           nearAbove[it->mMinDTgtSq].push_back( *it );
+       } // if
+       else
+       {
+         if( it->mLowHalfPlane )
+           farBelow[it->mMinDTgtSq].push_back( *it );
+         else
+           farAbove[it->mMinDTgtSq].push_back( *it );
+       } // else
+     } // for
+
+
+   } // CSimFireCore::GenerateFollowingGeneration
+
+   //-------------------------------------------------------------------------------------------------
+
+   bool CSimFireCore::ContinueNextGAIteration( const ListOfRunDescriptors_t & runParams )
+   {
+     return false;
+   } // CSimFireCore::ContinueNextGAIteration
 
    //-------------------------------------------------------------------------------------------------
 

@@ -98,6 +98,9 @@ namespace SimFire
     double_t GetLogInterval() const { return mLogInterval; }
     //!< \brief Returns time interval between entries [s]
 
+    int32_t GetSeed() const { return mSeed; }
+    //!< \brief Returns seed for random number generator (if needed)
+
     int32_t GetNumberOfThreads() const { return mNumberOfThreads; }
     //!< \brief Returns number of threads to be used for parallel processing
 
@@ -135,6 +138,8 @@ namespace SimFire
                         //!< Output file name template
     double_t mLogInterval; 
                         //!< Time interval between entries [s]
+
+    int32_t mSeed;      //!< Seed for random number generator (if needed)
 
     int32_t mNumberOfThreads;
                         //!< Number of threads to be used for parallel processing
