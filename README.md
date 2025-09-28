@@ -130,4 +130,36 @@ Specifically, the components used are:
   - **New Generation**: The offspring, along with some of the parents, form the next generation of solutions. 
   - **Iteration**: Pevious steps are repeated for a specified number of generations or until a termination criterion is met (e.g., a satisfactory solution is found). 
 
-## Genetic algorithm in SimFire
+## Evolutionary algorithm in SimFire
+
+Applying a evolutionary algorithm to a simple ballistics case may seem like using a sledgehammer to crack  
+a nut, but this approach allows the simulation to be expanded arbitrarily to include other perturbations, 
+such as wind, inhomogeneity of the gravitational field, inhomogeneity of the density of the environment,
+and so on. The algorithm does not need to be changed after adding such complications, it will continue to 
+function. It is only necessary to ensure that the system does not become 
+[chaotic](https://en.wikipedia.org/wiki/Chaos_theory) with the added perturbations.
+
+In the case of the SimFire ​​application, the chromosome is represented by class **CSimFireSingleRunParams**,
+which contains information about the barrel's elevation and also summarizes statistical data about
+the simulation process, which allows fitness to be evaluated:
+
+  - **MISS POINT**: Minimal distance of the bullet from the target during the flight
+  - Time of the miss point (when closest approach to the target occurs)
+  - **RAISING/FALLING**: Whether the bullet was rising or falling at the time of closest approach to the target
+  - **NEAR/FAR**: Whether the __falling__ bullet was between shooter and target or behind the target at the time of closest approach
+  - **UNDER/ABOVE**: Whether the __rising__ bullet was below or above the target at the time of closest approach
+
+**Remark**: for complete simulation (wind etc) there should be also left/right flag implemented.
+
+Fittness is simply evaluated as the distance of the miss point from the target, and selection is done by
+comparation the distance with average value in the population. If the shot distance is greater than
+specifiec multiple of the average distance, the shot is discarded. 
+
+Crossover and mutation stages are implemented in following steps:
+
+   - Surviving chromosomes are divided into four groups according to the flags (nearWhileFalling,
+     farWhileFalling, overWhileRaising, underWhileRaising) and sorted according to distances
+   - In each category, the first few best chromosomes are cloned into the new generation with two mutations (fine shift of angle to correct direction)
+   - Corresponding pairs of chromosomes from opposing categories are parents of three offspring whose angles are uniformly distributed between them
+   - The remaining chromosomes are mutated so that their angle moves in the correct direction by a larger jump
+   - If there is any space left in the new generation, it is filled with random chromosomes generated just like in the first generation
