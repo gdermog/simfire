@@ -45,13 +45,13 @@ According to the law of action and reaction, the forces between two particles ar
 in magnitude and opposite in direction. In the continuous flow of time, both the forces and 
 the acceleration change continuously, and with them the velocities and positions of the particles.
 Integral and differential calculus is necessary for the solution, but it cannot satisfactorily solve 
-the problem in full generality. However, if we replace the continuous flow of time with a sequence
+all problems in full generality. However, if we replace the continuous flow of time with a sequence
 
 $$t _{n+1} = t _n + \Delta t$$
 
 where $\Delta t$ is a fixed constant (time step) and if we assume that the particles move 
 uniformly in a straight line between the individual points of the sequence, the problem becomes
-much simpler. Let's say that the observedparticle is at time instant $t _n$, its current 
+much simpler. Let's say that the observed particle is at time instant $t _n$, its current 
 position is $\vec{s _n} = ( x _n, y _n, z _n )$ and its velocity is $\vec{v _n} = ( v _{xn}, v _{yn}, v _{zn} )$. 
 The acceleration that acts on the particle here can be found as
 
@@ -63,13 +63,13 @@ if any is introduced in the problem (for example, gravitational). Let us assume 
 if the particles moves uniformly in a straight line until the moment $t _{n+1}$, acceleration 
 acts on it all the time. Therefore, it will be true that
 
-$$\vec{v _{n+1} } = \vec{v _n} + \Delta t \cdot \vec{a _n} = \left( v _{xn} + \Delta t \cdot a _{xn}, \:
-v _{yn} + \Delta t \cdot a _{yn}, \: v _{zn} + \Delta t \cdot a _{zn} \right)$$
+$$\vec{v _{n+1} } = \vec{v _n} + \Delta t \cdot \vec{a _n} = \left( v _{xn} + \Delta t \cdot a _{xn}, 
+v _{yn} + \Delta t \cdot a _{yn},  v _{zn} + \Delta t \cdot a _{zn} \right)$$
 
 we then determine the change in position as
 
-$$\vec{s _{n+1} } = \vec{s _n} + \Delta t \cdot \vec{v _n} = \left( x _n + \Delta t \cdot v _{xn}, \:
-y _n + \Delta t \cdot v _{yn}, \: z _n + \Delta t \cdot v _{zn} \right)$$
+$$\vec{s _{n+1} } = \vec{s _n} + \Delta t \cdot \vec{v _n} = \left( x _n + \Delta t \cdot v _{xn}, 
+y _n + \Delta t \cdot v _{yn},  z _n + \Delta t \cdot v _{zn} \right)$$
 
 In the next step, we recalculate $\vec{F}$ (which is usually dependent on position, in some cases also
 on velocity) and calculate the following velocity and position. We do this in a cycle for all particles
@@ -77,3 +77,36 @@ in the system until a specified time elapses or until other selected conditions 
 a sequence of positions and velocities of all particles in the system. If we choose a sufficiently small
 time step, these sequences will satisfactorily approximate the continuous functions of time, which are
 the position and velocity of the particles in the real Newtonian universe.
+
+## Application to SimFire
+
+In the case of the SimFire ​​application, it is basically a simulation of the movement of a single particle 
+(bullet) in a homogeneous gravitational field with environmental resistance. The second object in 
+the simulated scene is the target - it remains stationary. At each step, the movement is performed 
+according to the previously described principles and it is checked whether the bullet has hit 
+the target (i.e. is close enough to it) or whether it has landed on the terrain. 
+
+Both particles (bullet and target) are constructed according to 
+[Entity Component System](https://en.wikipedia.org/wiki/Entity_component_system) architecture,
+eg. particles are entities and their properties (position, velocity, mass, etc.) are components.
+Specifically, the components used are:
+
+  - **cpId**: Entity identifier (mainly for debugging and logging)
+  - **cpPosition**: 3D position of the entity
+  - **cpVelocity**: 3D velocity of the entity
+  - **cpGeometry**: Geometrical representation of the entity (ideal sphere with radius)
+  - **cpPhysProps**: Physical properties of the entity (mass, drag coefficient)
+
+  Stationary target entity has only cpId, cpPosition and cpGeometry components. Used processors are:
+
+  - **procURM**: uniform rectilinear motion, updates the position of entities according to their velocity
+  - **procDVA**: calculates change in velocity according to gravitational acceleration
+  - **procOCC**: detects collisions between entities
+  - **procOCS**: detects collisions of entities with the terrain (ground plane at z=0)
+  - **procActCheck**: informs main loop if there are still active entities (bullet in flight)
+
+  ESC is implemented using [EnTT](https://github.com/skypjack/entt) library.
+
+  The outlined approach allows for easy expansion of the simulation with additional possible 
+  moving objects and stationary bodies - these can be added to the scene using the EnTT library 
+  resources and nothing else needs to be changed in the code, the simulation will run in the same way.
