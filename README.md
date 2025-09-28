@@ -78,7 +78,7 @@ a sequence of positions and velocities of all particles in the system. If we cho
 time step, these sequences will satisfactorily approximate the continuous functions of time, which are
 the position and velocity of the particles in the real Newtonian universe.
 
-## Application to SimFire
+## Time discretization method in SimFire
 
 In the case of the SimFire ​​application, it is basically a simulation of the movement of a single particle 
 (bullet) in a homogeneous gravitational field with environmental resistance. The second object in 
@@ -110,3 +110,24 @@ Specifically, the components used are:
   The outlined approach allows for easy expansion of the simulation with additional possible 
   moving objects and stationary bodies - these can be added to the scene using the EnTT library 
   resources and nothing else needs to be changed in the code, the simulation will run in the same way.
+
+  ## Genetic algorithm - basic idea
+
+  Genetic algorithms are search heuristics that use concepts of biological evolution, such as natural
+  selection and genetics, to find optimal or near-optimal solutions to complex problems. They begin
+  with a population of random candidate solutions (chromosomes), which are then iteratively improved 
+  through a process of fitness evaluation, selection of the fittest, and genetic operations like crossover 
+  (combining traits from two parents) and mutation (random changes), ultimately evolving towards better 
+  solutions.  
+
+  How Genetic Algorithms Work:
+
+  - **Initialization**: The process starts with a population of candidate solutions, often represented as strings of numbers or bits (chromosomes), generated randomly. 
+  - **Fitness Evaluation**: A fitness function evaluates each solution in the population, assigning it a score that indicates how well it solves the problem. 
+  - **Selection**: Solutions with higher fitness values are selected for reproduction, mimicking "survival of the fittest". 
+  - **Crossover (Recombination)**: Two selected "parent" solutions are combined to create new "offspring" solutions, exchanging genetic material in a way analogous to biological reproduction. 
+  - **Mutation**: Random changes are introduced into the offspring's genetic code to maintain diversity and explore new parts of the search space, preventing the algorithm from getting stuck in local optima. 
+  - **New Generation**: The offspring, along with some of the parents, form the next generation of solutions. 
+  - **Iteration**: Pevious steps are repeated for a specified number of generations or until a termination criterion is met (e.g., a satisfactory solution is found). 
+
+## Genetic algorithm in SimFire
