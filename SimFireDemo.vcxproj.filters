@@ -343,6 +343,9 @@
     <None Include="data\sim_test_simple.ini">
       <Filter>data</Filter>
     </None>
+    <None Include="README.md">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="entt\natvis\config.natvis">

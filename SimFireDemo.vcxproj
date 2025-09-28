@@ -177,6 +177,7 @@
   <ItemGroup>
     <None Include="data\sim_test.ini" />
     <None Include="data\sim_test_simple.ini" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="entt\natvis\config.natvis" />
