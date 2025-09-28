@@ -30,11 +30,50 @@ direction which will hit the target at a fixed muzzle velocity. This part uses
 a genetic algorithm to find a solution. To increase performance simulations of individual 
 shots within one generation in run parallel by standard C++ multi-threading tools.
 
-## Time discretization method
+## Time discretization method - basic idea
 
-\section{Základní myšlenka diskretizace času}
-
+The method of time discretization is suitable for simulating the behavior of mechanical
+systems with a finite number of particles. Its basic idea is to replace the continuous
+flow of time with a discrete flow - in simple terms, jumps along the time axis. In the real
+universe, time changes continuously and at any moment the interactions of two arbitrary particles
+of the system can be described using Newton's law of motion $F = m \cdot a$:
 
 $$ F_{ij}(x _i, y_i, z_i, x _j, y_j, z_j ) = m _i a_i $$
 $$ - F_{ij}(x _i, y_i, z_i, x _j, y_j, z_j ) = m _j a_j $$
 
+According to the law of action and reaction, the forces between two particles are equal
+in magnitude and opposite in direction. In the continuous flow of time, both the forces and 
+the acceleration change continuously, and with them the velocities and positions of the particles.
+Integral and differential calculus is necessary for the solution, but it cannot satisfactorily solve 
+the problem in full generality. However, if we replace the continuous flow of time with a sequence
+
+$$t _{n+1} = t _n + \Delta t$$
+
+where $\Delta t$ is a fixed constant (time step) and if we assume that the particles move 
+uniformly in a straight line between the individual points of the sequence, the problem becomes
+much simpler. Let's say that the observedparticle is at time instant $t _n$, its current 
+position is $\vec{s _n} = ( x _n, y _n, z _n )$ and its velocity is $\vec{v _n} = ( v _{xn}, v _{yn}, v _{zn} )$. 
+The acceleration that acts on the particle here can be found as
+
+$$\vec{a _n}= ( a _{xn}, a _{yn}, a _{zn} ) = \frac{\vec{F}}{m}$$
+
+where $m$ is the mass of the particle and $\vec{F}$ the resultant of all forces acting on
+it\-i.e. the sum of the forces from all other particles plus the external field strength, 
+if any is introduced in the problem (for example, gravitational). Let us assume that even 
+if the particles moves uniformly in a straight line until the moment $t _{n+1}$, acceleration 
+acts on it all the time. Therefore, it will be true that
+
+$$\vec{v _{n+1} } = \vec{v _n} + \Delta t \cdot \vec{a _n} = \left( v _{xn} + \Delta t \cdot a _{xn}, \:
+v _{yn} + \Delta t \cdot a _{yn}, \: v _{zn} + \Delta t \cdot a _{zn} \right)$$
+
+we then determine the change in position as
+
+$$\vec{s _{n+1} } = \vec{s _n} + \Delta t \cdot \vec{v _n} = \left( x _n + \Delta t \cdot v _{xn}, \:
+y _n + \Delta t \cdot v _{yn}, \: z _n + \Delta t \cdot v _{zn} \right)$$
+
+In the next step, we recalculate $\vec{F}$ (which is usually dependent on position, in some cases also
+on velocity) and calculate the following velocity and position. We do this in a cycle for all particles
+in the system until a specified time elapses or until other selected conditions occur. We thus obtain 
+a sequence of positions and velocities of all particles in the system. If we choose a sufficiently small
+time step, these sequences will satisfactorily approximate the continuous functions of time, which are
+the position and velocity of the particles in the real Newtonian universe.
