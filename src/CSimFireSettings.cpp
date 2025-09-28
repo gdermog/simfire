@@ -40,7 +40,6 @@ namespace SimFire
      mg( 9.81 ),
      mDensity( 1.225 ),
      mdt( 0.01 ),
-     mOutFile( "SimFire%sLog.txt" ),
      mLogInterval( 0.1 ),
      mSeed( -1 ),
      mNumberOfThreads( 8 ),
@@ -115,8 +114,6 @@ namespace SimFire
        if (!IsPositive(mg))
          vErrors.emplace_back("Gravitational acceleration must be positive");
        mDensity = inCfg.GetValueDouble( "environment", "density", 0.0 );
-       if (!IsPositive(mDensity))
-         vErrors.emplace_back("Air density must be positive");
 
        mdt = inCfg.GetValueDouble( "simulation", "dt", 0.0 );
        if (!IsPositive(mdt))
@@ -130,7 +127,6 @@ namespace SimFire
        mNumberOfThreads = (int32_t)inCfg.GetValueUnsigned( "simulation", "threads", 0 );
        mSeed = (int32_t)inCfg.GetValueInteger( "simulation", "seed", -1 );
 
-       mOutFile = inCfg.GetValueStr( "logging", "outfile", "" );
        mLogInterval = inCfg.GetValueDouble( "logging", "interval", 0.0 );
      }
      catch( std::exception & e )
@@ -189,7 +185,6 @@ namespace SimFire
      PrpLine( out ) << "MaxGenerations" << mMaxGenerations << std::endl;
      PrpLine( out ) << "NumberOfThreads" << mNumberOfThreads << std::endl << std::endl;
 
-     PrpLine( out ) << "OutFile" << mOutFile << std::endl;
      PrpLine( out ) << "LogInterval" << mLogInterval << " s" << std::endl << std::endl;
 
 		 return out;

@@ -122,13 +122,19 @@ Specifically, the components used are:
 
   How Genetic Algorithms Work:
 
-  - **Initialization**: The process starts with a population of candidate solutions, often represented as strings of numbers or bits (chromosomes), generated randomly. 
-  - **Fitness Evaluation**: A fitness function evaluates each solution in the population, assigning it a score that indicates how well it solves the problem. 
-  - **Selection**: Solutions with higher fitness values are selected for reproduction, mimicking "survival of the fittest". 
-  - **Crossover (Recombination)**: Two selected "parent" solutions are combined to create new "offspring" solutions, exchanging genetic material in a way analogous to biological reproduction. 
-  - **Mutation**: Random changes are introduced into the offspring's genetic code to maintain diversity and explore new parts of the search space, preventing the algorithm from getting stuck in local optima. 
+  - **Initialization**: The process starts with a population of candidate solutions, often represented 
+    as strings of numbers or bits (chromosomes), generated randomly. 
+  - **Fitness Evaluation**: A fitness function evaluates each solution in the population, assigning it 
+    a score that indicates how well it solves the problem. 
+  - **Selection**: Solutions with higher fitness values are selected for reproduction, mimicking "survival 
+    of the fittest". 
+  - **Crossover (Recombination)**: Two selected "parent" solutions are combined to create new "offspring"
+    solutions, exchanging genetic material in a way analogous to biological reproduction. 
+  - **Mutation**: Random changes are introduced into the offspring's genetic code to maintain diversity 
+    and explore new parts of the search space, preventing the algorithm from getting stuck in local optima. 
   - **New Generation**: The offspring, along with some of the parents, form the next generation of solutions. 
-  - **Iteration**: Pevious steps are repeated for a specified number of generations or until a termination criterion is met (e.g., a satisfactory solution is found). 
+  - **Iteration**: Pevious steps are repeated for a specified number of generations or until a termination 
+    criterion is met (e.g., a satisfactory solution is found). 
 
 ## Evolutionary algorithm in SimFire
 
@@ -146,8 +152,9 @@ the simulation process, which allows fitness to be evaluated:
   - **MISS POINT**: Minimal distance of the bullet from the target during the flight
   - Time of the miss point (when closest approach to the target occurs)
   - **RAISING/FALLING**: Whether the bullet was rising or falling at the time of closest approach to the target
-  - **NEAR/FAR**: Whether the __falling__ bullet was between shooter and target or behind the target at the time of closest approach
-  - **UNDER/ABOVE**: Whether the __rising__ bullet was below or above the target at the time of closest approach
+  - **NEAR/FAR**: Whether the ***falling*** bullet was between shooter and target or behind the target at 
+    the time of closest approach
+  - **UNDER/ABOVE**: Whether the ***rising*** bullet was below or above the target at the time of closest approach
 
 **Remark**: for complete simulation (wind etc) there should be also left/right flag implemented.
 
@@ -157,9 +164,30 @@ specifiec multiple of the average distance, the shot is discarded.
 
 Crossover and mutation stages are implemented in following steps:
 
-   - Surviving chromosomes are divided into four groups according to the flags (nearWhileFalling,
-     farWhileFalling, overWhileRaising, underWhileRaising) and sorted according to distances
-   - In each category, the first few best chromosomes are cloned into the new generation with two mutations (fine shift of angle to correct direction)
-   - Corresponding pairs of chromosomes from opposing categories are parents of three offspring whose angles are uniformly distributed between them
-   - The remaining chromosomes are mutated so that their angle moves in the correct direction by a larger jump
-   - If there is any space left in the new generation, it is filled with random chromosomes generated just like in the first generation
+   - Surviving chromosomes are divided into four groups according to the flags (**nearWhileFalling**,
+     **farWhileFalling**, **overWhileRaising**, **underWhileRaising**) and sorted according to distances
+   - In each category, the first few best chromosomes are cloned into the new generation with two mutations 
+     (fine shift of angle to correct direction)
+   - Corresponding pairs of chromosomes from opposing categories are parents of three offspring whose angles 
+     are uniformly distributed between them
+   - The remaining chromosomes are mutated so that their angle moves in the correct direction by a larger shift
+   - If there is any space left in the new generation, it is filled with random chromosomes generated just 
+     like in the first generation
+
+# Compiling and running SimFire
+
+SimFire ​​is a standard project for MS Visual Studio and MSVC. It contains both a solution file and a project. It 
+assumes the C++20 language standard. Library [EnTT](https://github.com/skypjack/entt) is included in the project.
+
+To compile and run the project, open the solution file `SimFire.sln` in MS Visual Studio, build the project,
+and then run the executable. The program will execute the simulation based on predefined parameters and 
+output the results to the console.
+
+**Remark:** the project is targeted for SDK version 10 and platform toolset v145 (VS 2026), but it can be easily 
+downgraded in the project properties if necessary.
+
+## Simulation setup
+
+Simulation parameters are specified in the configuration INI file. The program requires the path to this file as
+the value of the command line parameter **--setup**. Another possible command line parameter is **--help**. 
+Everything else is set in the INI file (see directory /data in the repository for examples).

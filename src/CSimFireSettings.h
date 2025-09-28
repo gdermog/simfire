@@ -113,14 +113,14 @@ namespace SimFire
     double_t GetG() const { return mg; }
     //!< \brief Returns gravitational acceleration [m/s^2]
 
+		bool InVacuum() const { return ! IsPositive( mDensity ); }
+		//!< \brief Returns true if the simulation is in vacuum (no air resistance)
+
     double_t GetDensity() const { return mDensity; }
     //!< \brief Returns air density at sea level [kg/m^3]
 
     double_t GetDt() const { return mdt; }
     //!< \brief Returns time step [s]
-
-    const std::string & GetOutFile() const { return mOutFile; }
-    //!< \brief Returns output file name template
 
     double_t GetLogInterval() const { return mLogInterval; }
     //!< \brief Returns time interval between entries [s]
@@ -172,8 +172,6 @@ namespace SimFire
 
     double_t mdt;       //!< Time step [s]
 
-    std::string mOutFile;
-                        //!< Output file name template
     double_t mLogInterval; 
                         //!< Time interval between entries [s]
 
