@@ -10,6 +10,7 @@
 
 #include <iomanip>
 
+#include <SimFireStringTools.h>
 #include <CSimFireSingleRunParams.h>
 
 
@@ -28,7 +29,8 @@ namespace SimFire
      mMinTime( 0.0 ),
      mSimTime( 0.0 ),
      mNearHalfPlane( false ),
-     mLowHalfPlane( false )
+     mRaising( false ),
+     mBelow( false )
    {
 
    } /* CSimFireSingleRunParams::CSimFireSingleRunParams */
@@ -47,7 +49,7 @@ namespace SimFire
 
    //-------------------------------------------------------------------------------------------------
 
-   void CSimFireSingleRunParams::Preprint( std::ostream & out  )
+   std::ostream& CSimFireSingleRunParams::Preprint( std::ostream & out  )
    { 
      PrpLine( out ) << "RunIdentifier" << mRunIdentifier << std::endl << std::endl;
 
@@ -55,7 +57,25 @@ namespace SimFire
      PrpLine( out ) << "VelocityYCoef" << mVelocityYCoef << std::endl;
      PrpLine( out ) << "VelocityZCoef" << mVelocityZCoef << std::endl << std::endl;
 
+     return out;
+
    } // CSimFireSingleRunParams::Preprint
+
+   //-------------------------------------------------------------------------------------------------
+
+   void CSimFireSingleRunParams::Reset()
+   {
+     mVelocityXCoef = 1.0;
+     mVelocityYCoef = 0.0;
+     mVelocityZCoef = 1.0;
+     mMinDTgtSq = 1e99;
+     mMinTime = 0.0;
+     mSimTime = 0.0;
+     mNearHalfPlane = false;
+     mRaising = false;
+     mBelow = false;
+     mReturnCode = SimResCode_t::kNotStarted;
+   } // Reset
 
    //-------------------------------------------------------------------------------------------------
 
@@ -83,6 +103,19 @@ namespace SimFire
        default:                              return lInvalidCode;
      } // switch
    } // GetStrValue
+
+   //-------------------------------------------------------------------------------------------------
+
+
+   std::string CSimFireSingleRunParams::GetRunDesc()
+   {
+       return FormatStr( "run [%f, %f, %f], dist = %f m, dt = %.2f s, %s, %s, %s ",
+         mVelocityXCoef, mVelocityYCoef, mVelocityZCoef,
+         std::sqrt( mMinDTgtSq ), mMinTime,
+				 mRaising ? "raising" : "falling",
+				 mNearHalfPlane ? "near" : "far",
+				 mBelow ? "under" : "above" );
+	 } // GetRunDesc
 
 
 } // namespace PEGLDPCgenerator

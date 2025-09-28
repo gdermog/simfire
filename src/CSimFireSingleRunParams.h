@@ -55,9 +55,13 @@ namespace SimFire
    //! @name Public methods  */
    //@{-----------------------------------------------------------------------------------------------
 
-    void Preprint( std::ostream & out = std::cout );
+    std::ostream & Preprint( std::ostream & out = std::cout );
 
     static const std::string & GetStrValue( SimResCode_t code );
+
+    std::string GetRunDesc();
+
+    void Reset();
 
     //@{}---------------------------------------------------------------------------------------------
     //! @name Public data                                                                            
@@ -77,7 +81,8 @@ namespace SimFire
     double_t mMinDTgtSq;//!< Minimal distance of the bullet to the target in the last completed run squared [m^2]
     double_t mMinTime;  //!< Time when the minimal distance was reached in the last completed run [s]
     bool mNearHalfPlane;//!< \b true if the bullet passed target in half-plane containing the shooter
-    bool mLowHalfPlane; //!< \b true if the bullet passed under the target
+    bool mRaising;      //!< \b true if the bullet was rising when it reached the minimal distance to the target
+    bool mBelow;        //!< \b true if the bullet was below the target when it reached the minimal distance to the target
 
     double_t mSimTime;  //!< Total simulation time [s]
     SimResCode_t mReturnCode;

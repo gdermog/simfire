@@ -39,9 +39,9 @@ namespace SimFire
   //****** component: velocity ***********************************************************************
 
   struct cpVelocity {
-    double_t vX;         //!< X translation velocity (of centre of mass) [m/s]
-    double_t vY;         //!< Y translation velocity (of centre of mass) [m/s]
-    double_t vZ;         //!< Z translation velocity (of centre of mass) [m/s]
+    double_t vX;        //!< X translation velocity (of centre of mass) [m/s]
+    double_t vY;        //!< Y translation velocity (of centre of mass) [m/s]
+    double_t vZ;        //!< Z translation velocity (of centre of mass) [m/s]
   };
 
   //****** component: geometry ***********************************************************************
@@ -241,7 +241,7 @@ namespace SimFire
     mEnTTRegistry.clear();
     // Setup from previous run, if any, is cleared
 
-//------ Bullet entity creation ----------------------------------------------------------------
+    //------ Bullet entity creation ----------------------------------------------------------------
 
     const auto bullet = mEnTTRegistry.create();
 
@@ -259,7 +259,8 @@ namespace SimFire
       mSettings.GetGunZ() );
                         // Shooter position is given by user setup
 
-    double_t div = std::sqrt( runParams.mVelocityXCoef * runParams.mVelocityXCoef +
+    double_t div = std::sqrt(
+      runParams.mVelocityXCoef * runParams.mVelocityXCoef +
       runParams.mVelocityYCoef * runParams.mVelocityYCoef +
       runParams.mVelocityZCoef * runParams.mVelocityZCoef );
     if( IsZero( div ) )
@@ -346,6 +347,7 @@ namespace SimFire
 
 
     auto viewPos = mEnTTRegistry.view<cpPosition>();
+    auto viewV = mEnTTRegistry.view<cpVelocity>();
     auto targetPos = viewPos.get<cpPosition>( target );
 
     cpPosition nVectNear{
@@ -363,12 +365,7 @@ namespace SimFire
                         // is in the same half-plane as the shooter if the value of the half-plane equation
                         // at the bullet position has the same sign as this reference value.
 
-    // Next important half-space plane is the horizontal one passing through the target. It helps
-    // determine where the bullet was flying around target in vertical direction. This condition is given 
-    // by Z coordinate of the bullet and target, so no plane description is necessary.
-
-
-//------ Main simulation loop --------------------------------------------------------------------
+    //------ Main simulation loop --------------------------------------------------------------------
 
     while( !( noActiveObjects || collisionDetected ) )
     {
@@ -398,6 +395,7 @@ namespace SimFire
       //------ Specific calculation for the bullet and target ----------------------------------------
 
       auto bulletPos = viewPos.get<cpPosition>( bullet );
+      auto bulletV = viewV.get<cpVelocity>( bullet );
 
       double_t distX = bulletPos.X - targetPos.X;
       double_t distY = bulletPos.Y - targetPos.Y;
@@ -412,14 +410,16 @@ namespace SimFire
         runParams.mMinTime = actSimTime;
                         // New minimal distance of the bullet and the time of the event is stored.
 
+        runParams.mRaising = ( bulletV.vZ >= 0.0 );
+                        // Bullet is rising if its vertical velocity component is positive.
+
+        runParams.mBelow = ( bulletPos.Z < targetPos.Z );
+                        // Bullet is below the target if its Z coordinate is lower than the target Z coordinate.
+
         double bRefVal = nVectNear.X * bulletPos.X + nVectNear.Y * bulletPos.Y + nVectNear.Z * bulletPos.Z + dConstNear;
         runParams.mNearHalfPlane = ( referenceValueNearNegative ? ( bRefVal < 0.0 ) : ( bRefVal > 0.0 ) );
                         // Bullet is in the same half-plane as the shooter if the value of the half-space 
                         // plane equation at the bullet position has the same sign as the reference value.
-
-        runParams.mLowHalfPlane = bulletPos.Z < targetPos.Z;
-                        // Bullet is in the under the target if its Z coordinate is lower than the target 
-                        // Z coordinate.
 
       } // if
 
@@ -435,12 +435,13 @@ namespace SimFire
         double bRefVal = nVectNear.X * pos.X + nVectNear.Y * pos.Y + nVectNear.Z * pos.Z + dConstNear;
         bool nearHalfPlane = ( referenceValueNearNegative ? ( bRefVal < 0.0 ) : ( bRefVal > 0.0 ) );
 
-        std::string mssg = FormatStr( "In t = %.4f: Bullet pos = [%.3f, %.3f, %.3f], v = [%.3f, %.3f, %.3f], %s, %s",
+        std::string mssg = FormatStr( "In t = %.4f: Bullet pos = [%.3f, %.3f, %.3f], v = [%.3f, %.3f, %.3f], %s, %s, %s",
           actSimTime,
           pos.X, pos.Y, pos.Z,
           vel.vX, vel.vY, vel.vZ,
           ( nearHalfPlane ? "near" : "far" ),
-          ( pos.Z < targetPos.Z ? "under" : "above" ) );
+          ( pos.Z < targetPos.Z ? "under" : "above" ),
+          ( vel.vZ < 0.0 ? "falling" : "raising" ) );
 
         mLogCallback( runParams.mThreadIdentifier + ":" + mRunId, mssg );
       } // if

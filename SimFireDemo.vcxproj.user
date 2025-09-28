@@ -3,5 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommandArguments>--setup "w:\\Demos\\simfire\\data\\sim_test.ini"</LocalDebuggerCommandArguments>
     <RemoteDebuggerCommandArguments>--setup "w:\\Demos\\simfire\\data\\sim_test.ini"</RemoteDebuggerCommandArguments>
+    <LocalDebuggerCommandArgumentsHistory>--help --setup "w:\\Demos\\simfire\\data\\sim_test.ini"|--setup "w:\\Demos\\simfire\\data\\sim_test.ini"|</LocalDebuggerCommandArgumentsHistory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>--setup "w:\\Demos\\simfire\\data\\sim_test.ini"</LocalDebuggerCommandArguments>
+    <RemoteDebuggerCommandArguments>--setup "w:\\Demos\\simfire\\data\\sim_test.ini"</RemoteDebuggerCommandArguments>
+    <LocalDebuggerCommandArgumentsHistory>--setup "w:\\Demos\\simfire\\data\\sim_test_simple.ini"|--setup "w:\\Demos\\simfire\\data\\sim_test_simple.ini" --setup "w:\\Demos\\simfire\\data\\sim_test.ini"|--setup "w:\\Demos\\simfire\\data\\sim_test.ini"|</LocalDebuggerCommandArgumentsHistory>
   </PropertyGroup>
 </Project>

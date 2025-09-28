@@ -20,6 +20,12 @@ namespace SimFire
 
    CSimFireSettings::CSimFireSettings():
      mSimIdentifier( "SimFire"),
+		 mDoTestRun(false),
+		 mAimX( 0.0 ),
+		 mAimY( 0.0 ),
+		 mAimZStart( 0.0 ),
+		 mAimZEnd( 0.0 ),
+		 mAimZSteps( 1 ),
      mGunX( 0.0 ),
      mGunY( 0.0 ),
      mGunZ( 0.0 ),
@@ -38,7 +44,8 @@ namespace SimFire
      mLogInterval( 0.1 ),
      mSeed( -1 ),
      mNumberOfThreads( 8 ),
-     mRunsInGeneration( 25 )
+     mRunsInGeneration( 25 ),
+     mMaxGenerations( 50 ) 
    {
 
    } /* CSimFireSettings::CSimFireSettings */
@@ -74,24 +81,52 @@ namespace SimFire
          } // for
        } // else
 
+			 mDoTestRun = inCfg.GetValueBool( "test", "doTestRun", false);
+			 mAimX = inCfg.GetValueDouble( "test", "aimX", 0.0 );
+			 mAimY = inCfg.GetValueDouble( "test", "aimY", 0.0 );
+       mAimZStart = inCfg.GetValueDouble( "test", "aimZStart", 0.0 );
+			 mAimZEnd = inCfg.GetValueDouble( "test", "aimZEnd", 0.0 );
+			 mAimZSteps = (uint32_t)inCfg.GetValueUnsigned("test", "aimZSteps", 1);
+
        mGunX = inCfg.GetValueDouble( "gun", "x", 0.0 );
        mGunY = inCfg.GetValueDouble( "gun", "y", 0.0 );
        mGunZ = inCfg.GetValueDouble( "gun", "z", 0.0 );
        mVelocity = inCfg.GetValueDouble( "gun", "velocity", 0.0 );
+       if( !IsPositive( mVelocity ) )
+				 vErrors.emplace_back("Velocity must be positive");
        mCd = inCfg.GetValueDouble( "gun", "cd", 0.0 );
+       if (!IsPositive(mCd))
+         vErrors.emplace_back("Bullet drag coefficient must be positive");
        mMass = inCfg.GetValueDouble( "gun", "mass", 0.0 );
+       if (!IsPositive(mMass))
+         vErrors.emplace_back("Bullet mass must be positive");
        mBulletSize = inCfg.GetValueDouble( "gun", "size", 0.0 );
+       if (!IsPositive(mBulletSize))
+         vErrors.emplace_back("Bullet radius must be positive");
 
        mTgtX = inCfg.GetValueDouble( "target", "x", 0.0 );
        mTgtY = inCfg.GetValueDouble( "target", "y", 0.0 );
        mTgtZ = inCfg.GetValueDouble( "target", "z", 0.0 );
        mTgtSize = inCfg.GetValueDouble( "target", "size", 0.0 );
+       if (!IsPositive(mTgtSize))
+         vErrors.emplace_back("Target radius must be positive");
 
        mg = inCfg.GetValueDouble( "environment", "g", 0.0 );
+       if (!IsPositive(mg))
+         vErrors.emplace_back("Gravitational acceleration must be positive");
        mDensity = inCfg.GetValueDouble( "environment", "density", 0.0 );
+       if (!IsPositive(mDensity))
+         vErrors.emplace_back("Air density must be positive");
 
        mdt = inCfg.GetValueDouble( "simulation", "dt", 0.0 );
+       if (!IsPositive(mdt))
+         vErrors.emplace_back("Time step must be positive");
        mRunsInGeneration = (uint32_t)inCfg.GetValueInteger( "simulation", "generation", 0 );
+       if (!IsPositive(mRunsInGeneration))
+         vErrors.emplace_back("Generation size must be positive");
+       mMaxGenerations = (uint32_t)inCfg.GetValueInteger( "simulation", "maxgens", 0 );
+       if (!IsPositive(mMaxGenerations))
+         vErrors.emplace_back("Maximum number of generations size must be positive");
        mNumberOfThreads = (int32_t)inCfg.GetValueUnsigned( "simulation", "threads", 0 );
        mSeed = (int32_t)inCfg.GetValueInteger( "simulation", "seed", -1 );
 
@@ -119,9 +154,19 @@ namespace SimFire
 
    //-------------------------------------------------------------------------------------------------
 
-   void CSimFireSettings::Preprint( std::ostream & out  )
+   std::ostream& CSimFireSettings::Preprint( std::ostream & out  )
    { 
      PrpLine( out ) << "SimIdentifier:" << mSimIdentifier << std::endl << std::endl;
+
+     if (mDoTestRun)
+     {
+       PrpLine(out) << "DoTestRun" << (mDoTestRun ? "true" : "false") << std::endl;
+       PrpLine(out) << "AimX" << mAimX << std::endl;
+       PrpLine(out) << "AimY" << mAimY << std::endl;
+       PrpLine(out) << "AimZStart" << mAimZStart << std::endl;
+       PrpLine(out) << "AimZEnd" << mAimZEnd << std::endl;
+       PrpLine(out) << "AimZSteps" << mAimZSteps << std::endl << std::endl;
+     }
 
      PrpLine( out ) << "GunX" << mGunX << " m" << std::endl;
      PrpLine( out ) << "GunY" << mGunY << " m" << std::endl;
@@ -141,10 +186,13 @@ namespace SimFire
 
      PrpLine( out ) << "dt" << mdt << " s" << std::endl;
      PrpLine( out ) << "RunsInGeneration" << mRunsInGeneration << std::endl;
+     PrpLine( out ) << "MaxGenerations" << mMaxGenerations << std::endl;
      PrpLine( out ) << "NumberOfThreads" << mNumberOfThreads << std::endl << std::endl;
 
      PrpLine( out ) << "OutFile" << mOutFile << std::endl;
      PrpLine( out ) << "LogInterval" << mLogInterval << " s" << std::endl << std::endl;
+
+		 return out;
 
    } // CSimFireSettings::Preprint
 

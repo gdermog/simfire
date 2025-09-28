@@ -21,7 +21,8 @@ namespace SimFire
   //***** CSimFireSettings *****************************************************************************
 
   /*! \brief This class contains all parameters entered by the user from outside. They are given and 
-      constant, they cannot be changed during program execution. */
+      constant, they cannot be changed during program execution. Values are imported through means of 
+      CSimFireConfig class. */
   class CSimFireSettings
   {
 
@@ -40,8 +41,16 @@ namespace SimFire
    //@{-----------------------------------------------------------------------------------------------
 
     std::vector<std::string> ImportSettings( const SimFire::CSimFireConfig & inCfg );
+    /*! \brief Imports settings from configuration object
+    
+        \param[in] inCfg Configuration object containing all parameters
+        \return List of error messages. If empty, import was successful. */
 
-    void Preprint( std::ostream & out = std::cout );
+    std::ostream & Preprint( std::ostream & out = std::cout );
+    /*! \brief Sends all settings to given output stream
+     
+        \param[in,out] out Output stream, default is std::cout
+				\return Reference to output stream (allowing chains of << operators) */
 
     //@{}---------------------------------------------------------------------------------------------
     //! @name Input data getters                                                                            
@@ -50,6 +59,24 @@ namespace SimFire
     const std::string & GetSimIdentifier() const { return mSimIdentifier; }
     //!< \brief Returns simulation identifier
 
+		bool GetDoTestRun() const { return mDoTestRun; }
+		//!< \brief Returns true if a single test run is performed instead actual simulation
+
+		double_t GetAimX() const { return mAimX; }
+		//!< \brief Returns aiming coefficient X [-]
+
+		double_t GetAimY() const { return mAimY; }
+		//!< \brief Returns aiming coefficient Y [-]
+   
+		double_t GetAimZStart() const { return mAimZStart; }
+		//!< \brief Returns aiming coefficient Z, start [-]
+    
+    double_t GetAimZEnd() const { return mAimZEnd; }
+    //!< \brief Returns aiming coefficient Z, end [-]
+    
+		uint32_t GetAimZSteps() const { return mAimZSteps; }
+		//!< \brief Returns number of steps between start and end [-]
+    
     double_t GetGunX() const { return mGunX; }
     //!< \brief Returns X position of the shooter [m]
 
@@ -107,6 +134,9 @@ namespace SimFire
     uint32_t GetRunsInGeneration() const { return mRunsInGeneration; }
     //!< \brief Returns number of runs in one generation (genetic algorithm)
 
+    uint32_t GetMaxGenerations() const { return mMaxGenerations; }
+    //!< \brief Returns maximum number of generations (genetic algorithm)
+
   protected:
 
     //@}----------------------------------------------------------------------------------------------
@@ -115,6 +145,14 @@ namespace SimFire
 
     std::string mSimIdentifier;
                         //!< Simulation identifier
+
+    bool mDoTestRun;    //!< If true, a single test run is performed instead actual simulation
+    double_t mAimX;     //!< Aiming coefficient X[-]
+    double_t mAimY;     //!< Aiming coefficient Y[-]
+    double_t mAimZStart;//!< Aiming coefficient Z, start[-]
+    double_t mAimZEnd;  //!< Aiming coefficient Z, start[-]
+    uint32_t mAimZSteps; //!< Number of steps between start and end [-]
+
 
     double_t mGunX;     //!< X position of the shooter [m]
     double_t mGunY;     //!< Y position of the shooter [m]
@@ -146,9 +184,13 @@ namespace SimFire
 
     uint32_t mRunsInGeneration;
                         //!< Number of runs in one generation (for genetic algorithms)
+    uint32_t mMaxGenerations;
+                        //!< Maximum number of generations (for genetic algorithms)
 
 
     std::ostream & PrpLine( std::ostream & out );
+		/*!< \brief Helper for formatting output in Preprint method */
+    
 
     //@}
 

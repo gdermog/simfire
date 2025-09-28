@@ -71,9 +71,38 @@ namespace SimFire
 
     void GenerateInitialGeneration( ListOfRunDescriptors_t & runParams );
 
-    void GenerateFollowingGeneration( ListOfRunDescriptors_t & runParams );
+    void CreateFollowingGeneration( 
+      ListOfRunDescriptors_t & runParams, 
+      double_t avgDist,
+      size_t actGeneration );
 
-    bool ContinueNextGAIteration( const ListOfRunDescriptors_t & runParams );
+    void Spawn(
+      std::map<double_t, CSimFireSingleRunParams> & queue,
+      ListOfRunDescriptors_t & runParams,
+      size_t & fillingNewItem,
+			size_t spawners,
+      double_t fineTuneCoef );
+
+    void Recombine(
+      std::map<double_t, CSimFireSingleRunParams> & queue1,
+      std::map<double_t, CSimFireSingleRunParams> & queue2,
+      ListOfRunDescriptors_t & runParams,
+      size_t & fillingNewItem,
+      double_t incCoef,
+      double_t decCoef );
+
+    void Mutate(
+      CSimFireSingleRunParams & item,
+      ListOfRunDescriptors_t & runParams,
+      size_t & fillingNewItem,
+      double_t coef );
+
+    void Hallucinate(
+      ListOfRunDescriptors_t & runParams,
+      size_t & fillingNewItem,
+      double_t coarseTuneCoef );
+
+    bool ContinueNextGAIteration( const ListOfRunDescriptors_t & runParams, size_t actGeneration );
 
     const CSimFireSettings & mSettings;
 

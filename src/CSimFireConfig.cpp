@@ -42,7 +42,7 @@ namespace SimFire
 
    //-------------------------------------------------------------------------------------------------
 
-   void CSimFireConfig::Preprint( std::ostream & out  )
+   std::ostream & CSimFireConfig::Preprint( std::ostream & out  )
    { 
 
      for( auto &section: mCfgContent )
@@ -56,6 +56,8 @@ namespace SimFire
         } // for
         out << std::endl;
      } // for
+
+     return out;
 
    } // CSimFireConfig::Preprint
 

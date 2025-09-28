@@ -112,15 +112,73 @@ int main( int argc, char * argv[] )
 
   //------ Create and run the simulation -----------------------------------------------------------
 
-  SimFire::CSimFireCore simCore( settings );
+  bool res = true;
 
-  auto res = simCore.Run();
-
-  if( ! res )
+  if (settings.GetDoTestRun())
   {
-    std::cerr << "Simulation ended in error(s), check log file '" 
-              << simCore.GetLogFilePath() << "'" << std::endl << std::endl;
-  } // if
+    SimFire::CSimFireSingleRun run(settings,
+      [](const std::string& id, const std::string& mssg)
+      {
+         std::cout << "[" << id << "]   " << mssg << std::endl;
+      }
+    );
+
+    SimFire::CSimFireSingleRunParams runPars;
+    runPars.mRunIdentifier = "SIMPLE";
+    runPars.mThreadIdentifier = "Main";
+
+    std::cout << asteriskLine << std::endl;
+    std::cout << "Test run: " << std::endl;
+    std::cout << asteriskLine << std::endl << std::endl;
+    runPars.Preprint(std::cout) << std::endl;
+
+		double_t zAct = settings.GetAimZStart();
+		double_t increment = 
+      (settings.GetAimZEnd() - settings.GetAimZStart()) / settings.GetAimZSteps();
+
+    std::vector<SimFire::CSimFireSingleRunParams> allHits;
+
+    for (uint32_t step = 0; step < settings.GetAimZSteps(); ++step, zAct += increment )
+    {
+			runPars.Reset();
+
+      runPars.mVelocityXCoef = settings.GetAimX();
+      runPars.mVelocityYCoef = settings.GetAimY();
+			runPars.mVelocityZCoef = zAct;
+
+      run.Run( runPars );
+      std::cout << "Test " << runPars.GetRunDesc() << " ended with code "
+        << SimFire::CSimFireSingleRunParams::GetStrValue(runPars.mReturnCode) << std::endl;
+      if (runPars.mReturnCode == SimFire::CSimFireSingleRunParams::SimResCode_t::kError)
+        res = false;
+      else if (runPars.mReturnCode == SimFire::CSimFireSingleRunParams::SimResCode_t::kEndedCollision)
+				allHits.push_back(runPars);
+    }
+
+    std::cout << std::endl << asteriskLine << std::endl;
+    std::cout << "Hits " << std::endl;
+    std::cout << asteriskLine << std::endl << std::endl;
+
+    for( auto & hit : allHits )
+    {
+      std::cout << hit.GetRunDesc() << std::endl;
+		}
+
+  }
+  else
+  {
+
+    SimFire::CSimFireCore simCore(settings);
+
+    res = simCore.Run();
+
+    if (!res)
+    {
+      std::cerr << "Simulation ended in error(s), check log file '"
+        << simCore.GetLogFilePath() << "'" << std::endl << std::endl;
+    } // if
+
+  }
 
   return res;
 

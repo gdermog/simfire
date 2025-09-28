@@ -1,6 +1,6 @@
 //****************************************************************************************************
 //! \file SimFireGlobals.h                                                                          
-//! Module contains ...                                                                             
+//! Module contains some basics types and global constants used in other modules.                                                                            
 //****************************************************************************************************
 //                                                                                                  
 //****************************************************************************************************
@@ -47,13 +47,19 @@ namespace SimFire
   };
 
   inline bool IsZero( double_t val, double_t tol = 1e-12 ) { return ( ( -tol < val ) && ( val < tol ) ); }
+	//!< Returns true if the value is zero within given tolerance
+
+  inline bool IsPositive(double_t val, double_t tol = 1e-12) { return ( tol < val ); }
+	//!< Returns true if the value is positive within given tolerancel
 
   constexpr unsigned gPrintoutIdWidth = 20;
-  //!< 
+	//!< Standard width for printout identifiers
 
   constexpr unsigned gHelpMarginWidth = 5;
+	//!< Standard left margin for commandline help printout
 
   constexpr unsigned gHelpItemWidth = 20;
+	//!< Standard width for commandline help items
 
 } // namespace SimFire
 
