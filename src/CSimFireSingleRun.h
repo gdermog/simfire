@@ -1,6 +1,6 @@
 //****************************************************************************************************
 //! \file CSimFireSingleRun.h                                                                        
-//! Module contains declaration of CSimFireSingleRun class, which ...                                
+//! Module contains declaration of CSimFireSingleRun class, which is handling a single simulation run.                                
 //****************************************************************************************************
 //                                                                                                  
 //****************************************************************************************************
@@ -20,11 +20,7 @@ namespace SimFire
 
   //***** CSimFireSingleRun *****************************************************************************
 
-  /*!  \brief Brief description of the class
-
-  Detailed description of the class \n\n
-
-  <b>Remark.:</b> ...
+	/*!  \brief This class handles a single simulation run.
 
   */
   class CSimFireSingleRun
@@ -53,6 +49,10 @@ namespace SimFire
     //@{-----------------------------------------------------------------------------------------------
 
     int Run( CSimFireSingleRunParams & runParams );
+    /*! \brief Runs a single simulation with given parameters
+     
+        \param[in,out] runParams Parameters of the run, some output values are returned in this object
+				\return 0 if the run was successful, error code otherwise */
 
     //@{}---------------------------------------------------------------------------------------------
     //! @name Public data                                                                            
@@ -61,18 +61,25 @@ namespace SimFire
   protected:
 
     const CSimFireSettings & mSettings;
+		//<! Reference to settings object, which contains all parameters entered by user on startup
 
     LogCallback_t mLogCallback;
+		//!< Callback method for logging messages
 
     std::string mRunId;
+		//!< Identifier of the current run, taken from run parameters
 
     std::string mThreadId;
+		//!< Identifier of the thread that is processing the current run
 
     entt::registry mEnTTRegistry;
+		//!< EnTT registry containing all entities and components of the current simulation
 
     static const char * mBulletIdString;
+		//<! String identifier of the bullet entity
 
     static const char * mTargetIdString;
+		//<! String identifier of the target entity
 
     //@}
 
