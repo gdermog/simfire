@@ -199,6 +199,6 @@ Test runs can be exported to a CSV file for data review (see data/sim_test_simpl
 For a simple visual overview, one can use gnuplot with a pre-prepared script **showshoot.gpl** using 
 following command:
 
-´´´
+```
 gnuplot -e "INPUTFILE='my_file.csv'" showshoot.gpl
-´´´
+```
