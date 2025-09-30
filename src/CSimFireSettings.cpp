@@ -26,6 +26,8 @@ namespace SimFire
 		 mAimZStart( 0.0 ),
 		 mAimZEnd( 0.0 ),
 		 mAimZSteps( 1 ),
+		 mCSVExportTemplate(),
+		 mCSVHitsOnly( true ),
      mGunX( 0.0 ),
      mGunY( 0.0 ),
      mGunZ( 0.0 ),
@@ -44,7 +46,8 @@ namespace SimFire
      mSeed( -1 ),
      mNumberOfThreads( 8 ),
      mRunsInGeneration( 25 ),
-     mMaxGenerations( 50 ) 
+     mMaxGenerations( 50 ),
+     mIniZCoef( -1 )
    {
 
    } /* CSimFireSettings::CSimFireSettings */
@@ -56,7 +59,7 @@ namespace SimFire
 
    //-------------------------------------------------------------------------------------------------
 
-   std::vector<std::string> CSimFireSettings::ImportSettings( const SimFire::CSimFireConfig & inCfg )
+   std::vector<std::string> CSimFireSettings::ImportSettings( const SimFire::CSimFireConfig& inCfg )
    {
      std::vector<std::string> vErrors;
 
@@ -70,7 +73,7 @@ namespace SimFire
        } // if
        else
        {
-         for( auto & ch : mSimIdentifier )
+         for( auto& ch : mSimIdentifier )
          {
            if( !IsNormalChar( ch ) )
            {
@@ -80,58 +83,64 @@ namespace SimFire
          } // for
        } // else
 
-			 mDoTestRun = inCfg.GetValueBool( "test", "doTestRun", false);
-			 mAimX = inCfg.GetValueDouble( "test", "aimX", 0.0 );
-			 mAimY = inCfg.GetValueDouble( "test", "aimY", 0.0 );
+       mDoTestRun = inCfg.GetValueBool( "test", "doTestRun", false );
+       mAimX = inCfg.GetValueDouble( "test", "aimX", 0.0 );
+       mAimY = inCfg.GetValueDouble( "test", "aimY", 0.0 );
        mAimZStart = inCfg.GetValueDouble( "test", "aimZStart", 0.0 );
-			 mAimZEnd = inCfg.GetValueDouble( "test", "aimZEnd", 0.0 );
-			 mAimZSteps = (uint32_t)inCfg.GetValueUnsigned("test", "aimZSteps", 1);
-			 mCSVExportTemplate = inCfg.GetValueStr( "test", "csvExportTemplate", "" );
-			 mCSVHitsOnly = inCfg.GetValueBool( "test", "csvHitsOnly", true );
+       mAimZEnd = inCfg.GetValueDouble( "test", "aimZEnd", 0.0 );
+       mAimZSteps = (uint32_t)inCfg.GetValueUnsigned( "test", "aimZSteps", 1 );
+       if( !IsPositive( mAimZSteps ) )
+         vErrors.emplace_back( "AimZSteps must be positive" );
+       mCSVExportTemplate = inCfg.GetValueStr( "test", "csvExportTemplate", "" );
+       mCSVHitsOnly = inCfg.GetValueBool( "test", "csvHitsOnly", true );
 
        mGunX = inCfg.GetValueDouble( "gun", "x", 0.0 );
        mGunY = inCfg.GetValueDouble( "gun", "y", 0.0 );
        mGunZ = inCfg.GetValueDouble( "gun", "z", 0.0 );
        mVelocity = inCfg.GetValueDouble( "gun", "velocity", 0.0 );
        if( !IsPositive( mVelocity ) )
-				 vErrors.emplace_back("Velocity must be positive");
+         vErrors.emplace_back( "Velocity must be positive" );
        mCd = inCfg.GetValueDouble( "gun", "cd", 0.0 );
-       if (!IsPositive(mCd))
-         vErrors.emplace_back("Bullet drag coefficient must be positive");
+       if( !IsPositive( mCd ) )
+         vErrors.emplace_back( "Bullet drag coefficient must be positive" );
        mMass = inCfg.GetValueDouble( "gun", "mass", 0.0 );
-       if (!IsPositive(mMass))
-         vErrors.emplace_back("Bullet mass must be positive");
+       if( !IsPositive( mMass ) )
+         vErrors.emplace_back( "Bullet mass must be positive" );
        mBulletSize = inCfg.GetValueDouble( "gun", "size", 0.0 );
-       if (!IsPositive(mBulletSize))
-         vErrors.emplace_back("Bullet radius must be positive");
+       if( !IsPositive( mBulletSize ) )
+         vErrors.emplace_back( "Bullet radius must be positive" );
 
        mTgtX = inCfg.GetValueDouble( "target", "x", 0.0 );
        mTgtY = inCfg.GetValueDouble( "target", "y", 0.0 );
        mTgtZ = inCfg.GetValueDouble( "target", "z", 0.0 );
        mTgtSize = inCfg.GetValueDouble( "target", "size", 0.0 );
-       if (!IsPositive(mTgtSize))
-         vErrors.emplace_back("Target radius must be positive");
+       if( !IsPositive( mTgtSize ) )
+         vErrors.emplace_back( "Target radius must be positive" );
 
        mg = inCfg.GetValueDouble( "environment", "g", 0.0 );
-       if (!IsPositive(mg))
-         vErrors.emplace_back("Gravitational acceleration must be positive");
+       if( !IsPositive( mg ) )
+         vErrors.emplace_back( "Gravitational acceleration must be positive" );
        mDensity = inCfg.GetValueDouble( "environment", "density", 0.0 );
+       if( !IsPositive( mDensity ) )
+         vErrors.emplace_back( "Air density must not be negative" );
 
        mdt = inCfg.GetValueDouble( "simulation", "dt", 0.0 );
-       if (!IsPositive(mdt))
-         vErrors.emplace_back("Time step must be positive");
+       if( !IsPositive( mdt ) )
+         vErrors.emplace_back( "Time step must be positive" );
        mRunsInGeneration = (uint32_t)inCfg.GetValueInteger( "simulation", "generation", 0 );
-       if (!IsPositive(mRunsInGeneration))
-         vErrors.emplace_back("Generation size must be positive");
+       if( !IsPositive( mRunsInGeneration ) )
+         vErrors.emplace_back( "Generation size must be positive" );
        mMaxGenerations = (uint32_t)inCfg.GetValueInteger( "simulation", "maxgens", 0 );
-       if (!IsPositive(mMaxGenerations))
-         vErrors.emplace_back("Maximum number of generations size must be positive");
+       if( !IsPositive( mMaxGenerations ) )
+         vErrors.emplace_back( "Maximum number of generations size must be positive" );
        mNumberOfThreads = (int32_t)inCfg.GetValueUnsigned( "simulation", "threads", 0 );
        mSeed = (int32_t)inCfg.GetValueInteger( "simulation", "seed", -1 );
 
+       mIniZCoef = inCfg.GetValueDouble( "simulation", "inizcoef", -1.0 );
+
        mLogInterval = inCfg.GetValueDouble( "logging", "interval", 0.0 );
      }
-     catch( std::exception & e )
+     catch( std::exception& e )
      {
        vErrors.emplace_back( e.what() );
      } // catch
@@ -187,7 +196,9 @@ namespace SimFire
      PrpLine( out ) << "dt" << mdt << " s" << std::endl;
      PrpLine( out ) << "RunsInGeneration" << mRunsInGeneration << std::endl;
      PrpLine( out ) << "MaxGenerations" << mMaxGenerations << std::endl;
-     PrpLine( out ) << "NumberOfThreads" << mNumberOfThreads << std::endl << std::endl;
+     PrpLine( out ) << "NumberOfThreads" << mNumberOfThreads << std::endl;
+     PrpLine( out ) << "Seed" << mSeed << std::endl;
+     PrpLine( out ) << "IniZCoef" << mIniZCoef << std::endl << std::endl;
 
      PrpLine( out ) << "LogInterval" << mLogInterval << " s" << std::endl << std::endl;
 

@@ -1,6 +1,7 @@
 //****************************************************************************************************
 //! \file CSimFireCore.cpp                                                                        
-//! Module contains definitions of CSimFireCore class, declared in CSimFireCore.h, which ...    
+//! Module contains definitions of CSimFireCore class, declared in CSimFireCore.h, which handles 
+//! the core of the simulation engine.    
 //****************************************************************************************************
 //                                                                                                  
 //****************************************************************************************************
@@ -59,10 +60,10 @@ namespace SimFire
      ListOfRunDescriptors_t vRunParams( nrOfRuns, {} );
      std::vector<std::pair<ListOfRunDescriptors_t::iterator, ListOfRunDescriptors_t::iterator>> 
        vRunParamsPerThreadBunch( nThreads, {} );
-                        // For each simulation there is a set of parameters. Simulations are divided into
-                        // bunches, each of them is processed by one thread. vRunParams vectors holds all
-                        // parameter setss for all simulations, vRunParamsPerThreadBunch holds division
-                        // of vRunParams into bunches for each thread.
+                        // For each simulation there is a set of parameters. Simulations are divided 
+                        // into bunches, each of them is processed by one thread. vRunParams vectors 
+                        // holds all parameter setss for all simulations, vRunParamsPerThreadBunch 
+                        // holds division of vRunParams into bunches for each thread.
 
      uint32_t itemsPerBatch = nrOfRuns / nThreads;
      uint32_t itemsPerBatchRest = nrOfRuns % nThreads;
@@ -71,8 +72,8 @@ namespace SimFire
      size_t lastItem = 0;
 
      for( size_t thrdIdx = 0; thrdIdx < nThreads; ++thrdIdx )
-     {                  // Prepare bunch of runs for each thread (by separating dedicated parameter sets 
-                        // into separate groups)
+     {                  // Prepare bunch of runs for each thread (by separating dedicated parameter  
+                        // sets into individual groups)
 
        lastItem = firstItem + itemsPerBatch;
        if( 0 < itemsPerBatchRest )
@@ -99,7 +100,6 @@ namespace SimFire
        firstItem = lastItem;
 
      } // for
-
 
      //------- Main GA loop ------------------------------------------------------------------------------
 
@@ -129,7 +129,8 @@ namespace SimFire
              vRunThreadIds[thrdIdx], firstItem, lastItem - 1 ) );
 
          vRunFutures[thrdIdx] = std::async( std::launch::async, [=] {
-           RunBunch( vRunParamsPerThreadBunch[thrdIdx].first, vRunParamsPerThreadBunch[thrdIdx].second, vRunThreadIds[thrdIdx] );
+           RunBunch( vRunParamsPerThreadBunch[thrdIdx].first, vRunParamsPerThreadBunch[thrdIdx].second, 
+                     vRunThreadIds[thrdIdx] );
            } );
 
          firstItem = lastItem;
@@ -221,7 +222,8 @@ namespace SimFire
 
      //------- Results overview --------------------------------------------------------------------------
 
-     WriteLogMessage( "CORE", "\n\n****************************************\nSimulation finished, results overview\n****************************************\n" );
+     WriteLogMessage( "CORE", "\n\n****************************************\nSimulation finished,"
+                              "results overview\n****************************************\n" );
 
      size_t nHits = 0;
      for( auto & item : vRunParams )
@@ -237,9 +239,15 @@ namespace SimFire
      } // for
 
      if( 0 == nHits )
-       WriteLogMessage( "CORE", "No hits were achieved." );
+     {
+       WriteLogMessage( "CORE", FormatStr( "After %zu generations no hits were achieved.",
+         actGeneration + 1 ) );
+     } // if
      else
-       WriteLogMessage( "CORE", FormatStr( "%zu hits were achieved.", nHits ) );
+     {
+       WriteLogMessage( "CORE", FormatStr( "After %zu generations %zu hits were achieved.",
+         actGeneration + 1, nHits ) );
+     } // else
 
      WriteLogMessage( "CORE", "\n\n****************************************\n" );
 
@@ -259,14 +267,6 @@ namespace SimFire
 
    //-------------------------------------------------------------------------------------------------
 
-   const std::string & CSimFireCore::GetLogFilePath()
-   {
-     static std::string dummy( "NOT YET KNOWN" );
-     return dummy;
-   } // CSimFireCore::GetLogFilePath
-
-   //-------------------------------------------------------------------------------------------------
-
    void CSimFireCore::RunBunch(
      ListOfRunDescriptors_t::iterator runParamsBegin,
      ListOfRunDescriptors_t::iterator runParamsEnd,
@@ -276,7 +276,8 @@ namespace SimFire
      for( auto it = runParamsBegin; it != runParamsEnd; ++it )
        it->mReturnCode = CSimFireSingleRunParams::SimResCode_t::kNotStarted;
 
-     CSimFireSingleRun runWorker( mSettings, BIND_SINGLE_RUN_LOG_CALLBACK( this, CSimFireCore::WriteLogMessage ) );
+     CSimFireSingleRun runWorker( mSettings, 
+       BIND_SINGLE_RUN_LOG_CALLBACK( this, CSimFireCore::WriteLogMessage ) );
 
      unsigned nr = 0;
      std::string runList;
@@ -302,37 +303,27 @@ namespace SimFire
    void CSimFireCore::GenerateInitialGeneration( ListOfRunDescriptors_t & runParams )
    {
 
-     double_t distX = mSettings.GetTgtX() - mSettings.GetGunX();
-     double_t distY = mSettings.GetTgtY() - mSettings.GetGunY();
-     double_t distZ = mSettings.GetTgtZ() - mSettings.GetGunZ();
-                        // Vector of LOS from gunner to target
-
-     distZ *= 2.0;      // Initial elevation angle is higher than angle to the target.
-                        // Bullet spray (bunches) will be constructed around it.
-
-     double zRatio = 0.25;
-
      uint32_t runNr = 0;
      for( auto & item : runParams )
      {
        item.mRunIdentifier = FormatStr( "RUN_%02u", ++runNr );
-       item.mVelocityXCoef = distX;
-       item.mVelocityYCoef = distY;
-       item.mVelocityZCoef = distZ * ( 1.0 + ( (double_t)rand() / (double_t)RAND_MAX - 0.5 ) * zRatio );
-                        // Initial velocity direction coefficients are generated as random values around
-                        // the LOS vector to the target in Z axis, X and Y axis are constant. This only 
-                        // places the unknown variable to the Z axis (angle) - the entire simulation takes 
-                        // place in a plane perpendicular to the ground, oriented so that it points directly 
-                        // from the shooter to the target. This simplifying assumption is given by the absence 
-                        // of additional disturbing influences for the X and Y directions - but in a more 
-                        // complex simulation they would have to be taken into account.
-
        item.mMinDTgtSq = std::numeric_limits<double_t>::max();
        item.mMinTime = 0.0;
        item.mNearHalfPlane = false;
        item.mSimTime = 0.0;
        item.mReturnCode = CSimFireSingleRunParams::SimResCode_t::kNotStarted;
      } // for
+
+     size_t fillingNewItem = 0;
+     Hallucinate( runParams, fillingNewItem, 0.25 );
+                        // Initial velocity direction coefficients are generated as random values 
+                        // around the LOS vector to the target in Z axis, X and Y axis are constant. 
+                        // This only  places the unknown variable to the Z axis (angle) - the entire 
+                        // simulation takes  place in a plane perpendicular to the ground, oriented so
+                        // that it points directly from the shooter to the target. This simplifying 
+                        // assumption is given by the absence of additional disturbing influences for 
+                        // the X and Y directions - but in a more complex simulation they would have 
+                        // to be taken into account.
 
    } // CSimFireCore::GenerateInitialGeneration
 
@@ -442,7 +433,8 @@ namespace SimFire
      newItem1.Reset();
      newItem1.mVelocityXCoef = ( nmItem.mVelocityXCoef + fmItem.mVelocityXCoef ) * 0.5;
      newItem1.mVelocityYCoef = ( nmItem.mVelocityYCoef + fmItem.mVelocityYCoef ) * 0.5;
-     newItem1.mVelocityZCoef = ( incCoef * nmItem.mVelocityZCoef + decCoef * fmItem.mVelocityZCoef ) / ( decCoef + incCoef );
+     newItem1.mVelocityZCoef = ( incCoef * nmItem.mVelocityZCoef + decCoef * fmItem.mVelocityZCoef ) /
+                               ( decCoef + incCoef );
 
      if( fillingNewItem >= runParams.size() )
        return;
@@ -450,7 +442,8 @@ namespace SimFire
      newItem2.Reset();
      newItem2.mVelocityXCoef = ( nmItem.mVelocityXCoef + fmItem.mVelocityXCoef ) * 0.5;
      newItem2.mVelocityYCoef = ( nmItem.mVelocityYCoef + fmItem.mVelocityYCoef ) * 0.5;
-     newItem2.mVelocityZCoef = ( decCoef * nmItem.mVelocityZCoef + incCoef * fmItem.mVelocityZCoef ) / ( decCoef + incCoef );
+     newItem2.mVelocityZCoef = ( decCoef * nmItem.mVelocityZCoef + incCoef * fmItem.mVelocityZCoef ) / 
+                               ( decCoef + incCoef );
 
      if( fillingNewItem >= runParams.size() )
        return;
@@ -483,7 +476,8 @@ namespace SimFire
      newItem.Reset();
      newItem.mVelocityXCoef = item.mVelocityXCoef;
      newItem.mVelocityYCoef = item.mVelocityYCoef;
-     newItem.mVelocityZCoef = item.mVelocityZCoef * ( 1.0 + ( (double_t)rand() / (double_t)RAND_MAX ) * coef );
+     newItem.mVelocityZCoef = item.mVelocityZCoef * 
+                              ( 1.0 + ( (double_t)rand() / (double_t)RAND_MAX ) * coef );
 
      std::string tmpOut = FormatStr( "MUTATING\n\n%s",
        item.GetRunDesc() );
@@ -502,6 +496,13 @@ namespace SimFire
      double_t distX = mSettings.GetTgtX() - mSettings.GetGunX();
      double_t distY = mSettings.GetTgtY() - mSettings.GetGunY();
      double_t distZ = mSettings.GetTgtZ() - mSettings.GetGunZ();
+
+
+     if( IsPositive( mSettings.GetIniZCoef() ) )
+       distZ = mSettings.GetIniZCoef();
+     else
+       distZ *= 2.0;    // Initial elevation angle.  Bullet spray (bunches) will be
+                        // constructed around it.
 
      if( fillingNewItem >= runParams.size() )
        return;
@@ -526,8 +527,6 @@ namespace SimFire
      size_t actGeneration )
    {
 
-     //std::map<double_t, CSimFireSingleRunParams> simpleDistanceSortedMiss;
-
      std::map<double_t, CSimFireSingleRunParams> nearWhileFallingMiss;
      std::map<double_t, CSimFireSingleRunParams> farWhileFallingMiss;
 
@@ -541,7 +540,7 @@ namespace SimFire
      double_t fineTuneDecay = 0.9;
 
      double_t zRatioRnd = 0.25;
-     size_t spawners = 2; // 5;
+     size_t spawners = 2;
 
      std::string tmpOut;
 
@@ -556,8 +555,6 @@ namespace SimFire
          WriteLogMessage( "CORE", FormatStr( "%s EXCLUDED as it is too distant", it->GetRunDesc() ) );
          continue;
 			 } // if
-
-       //simpleDistanceSortedMiss[it->mMinDTgtSq] = *it;
 
        if( it->mRaising )
        {
@@ -581,7 +578,6 @@ namespace SimFire
      for( uint32_t i = 0; i < actGeneration; ++i )
        fineTuneCoef *= fineTuneDecay;
 
-		 //Spawn( simpleDistanceSortedMiss, runParams, fillingNewItem, spawners, fineTunecCoef );
      Spawn( nearWhileFallingMiss, runParams, fillingNewItem, spawners, fineTuneCoef );
      Spawn( farWhileFallingMiss, runParams, fillingNewItem, spawners, fineTuneCoef );
 		 Spawn( overWhileRaisingMiss, runParams, fillingNewItem, spawners, fineTuneCoef );
@@ -589,42 +585,51 @@ namespace SimFire
 
      size_t cpairsNr = std::min( nearWhileFallingMiss.size(), farWhileFallingMiss.size() );
      while( 0 < cpairsNr )
-     {                  // A simple GA recombination operator. It takes a pair of shots, one of which is "long"
-                        // and the other "short", and produces two new ones with elevations between the original
-                        // two (one slightly more than the arithmetic mean, the other slightly less than the
-                        // arithmetic mean). Works for "upper arc" shooting.
+     {                  // A simple GA recombination operator. It takes a pair of shots, one of which 
+                        // is "long" and the other "short", and produces three new ones with elevations 
+                        // between the original two (one slightly more than the arithmetic mean,
+                        // the other slightly less than the arithmetic mean). Works for "upper arc" 
+                        // shooting.
        Recombine( nearWhileFallingMiss, farWhileFallingMiss, runParams, fillingNewItem, incCoef, decCoef );
+       --cpairsNr;
+     } // while
+
+     cpairsNr = std::min( overWhileRaisingMiss.size(), underWhileRaisingMiss.size() );
+     while( 0 < cpairsNr )
+     {                  // A simple GA recombination operator. It takes a pair of shots, one of which 
+                        // is "abovr" and the other "under", and produces three new ones with elevations 
+                        // between the original two (one slightly more than the arithmetic mean,
+                        // the other slightly less than the arithmetic mean). Works for "direct line" 
+                        // shooting.
+       Recombine( overWhileRaisingMiss, underWhileRaisingMiss, runParams, fillingNewItem, incCoef, decCoef );
        --cpairsNr;
      } // while
        
      for( auto nmItem: nearWhileFallingMiss )
-     {                  // Fill the rest of the new generation by mutating the best results from leftovers 
-                        // of the previous generation (slight random increase of elevation angle for near
-                        // misses).
+     {                  // Fill the rest of the new generation by mutating the best results from  
+                        // leftovers of the previous generation (slight random increase of elevation 
+                        // angle for near misses).
        Mutate( nmItem.second, runParams, fillingNewItem, incCoef );
      } // for
 
      for( auto nmItem : farWhileFallingMiss )
-     {                  // Fill the rest of the new generation by mutating the best results from leftovers 
-                        // of the previous generation (slight random decrease of elevation angle for far
-                        // misses).
+     {                  // Fill the rest of the new generation by mutating the best results from  
+                        // leftovers of the previous generation (slight random decrease of elevation 
+                        // angle for far misses).
        Mutate( nmItem.second, runParams, fillingNewItem, decCoef );
      } // for
 
-     cpairsNr = std::min( overWhileRaisingMiss.size(), underWhileRaisingMiss.size() );
-     while( 0 < cpairsNr )
-     {
-       Recombine( overWhileRaisingMiss, underWhileRaisingMiss, runParams, fillingNewItem, incCoef, decCoef );
-       --cpairsNr;
-		 } // while
-
      for( auto nmItem : overWhileRaisingMiss )
-     {
+     {                  // Fill the rest of the new generation by mutating the best results from  
+                        // leftovers of the previous generation (slight random decrease of elevation 
+                        // angle for above misses).
        Mutate( nmItem.second, runParams, fillingNewItem, decCoef );
      } // for
 
      for( auto nmItem : underWhileRaisingMiss )
-     {
+     {                  // Fill the rest of the new generation by mutating the best results from  
+                        // leftovers of the previous generation (slight random decrease of elevation 
+                        // angle for under misses).
        Mutate( nmItem.second, runParams, fillingNewItem, incCoef );
      } // for
 
@@ -633,7 +638,8 @@ namespace SimFire
        Hallucinate( runParams, fillingNewItem, zRatioRnd );
 		 } // while
 
-     WriteLogMessage( "CORE", "\n\n****************************************\nNew generation created\n****************************************\n" );
+     WriteLogMessage( "CORE", "\n\n****************************************\nNew generation "
+                              "created\n****************************************\n" );
 
      for( auto & item : runParams )
      {

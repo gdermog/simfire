@@ -1,6 +1,6 @@
 //****************************************************************************************************
 //! \file main.cpp                                                                                  
-//! Module contains entrypoint for ...                                                              
+//! Module contains entrypoint for the whole application.                                                              
 //****************************************************************************************************
 //                                                                                                  
 //****************************************************************************************************
@@ -116,14 +116,13 @@ int main( int argc, char * argv[] )
 
   bool res = true;
 
-  if (settings.GetDoTestRun())
+  if( settings.GetDoTestRun() )
   {
-    SimFire::CSimFireSingleRun runWorker(settings,
+    SimFire::CSimFireSingleRun runWorker( settings,
       [](const std::string& id, const std::string& mssg)
       {
          std::cout << "[" << id << "]   " << mssg << std::endl;
-      }
-    );
+      } );
 
     SimFire::CSimFireSingleRunParams runPars;
     runPars.mRunIdentifier = "TRUN";
@@ -149,7 +148,7 @@ int main( int argc, char * argv[] )
         BIND_SINGLE_RUNEXPORT_CALLBACK(&csvExporter, SimFire::CSimFireCSVExporter::DoExportState));
     } // if
 
-    for (uint32_t step = 0; step < settings.GetAimZSteps(); ++step, zAct += increment )
+    for( uint32_t step = 0; step < settings.GetAimZSteps(); ++step, zAct += increment )
     {
 			runPars.Reset();
 
@@ -202,20 +201,19 @@ int main( int argc, char * argv[] )
 				runWorker.Run( hit );
       } // if
 
-		}
+		} // for
 
-  }
+  } // if
   else
   {
 
-    SimFire::CSimFireCore simCore(settings);
+    SimFire::CSimFireCore simCore( settings );
 
     res = simCore.Run();
 
     if (!res)
     {
-      std::cerr << "Simulation ended in error(s), check log file '"
-        << simCore.GetLogFilePath() << "'" << std::endl << std::endl;
+      std::cout << "Simulation ended in error(s), check log messages" << std::endl << std::endl;
     } // if
 
   }

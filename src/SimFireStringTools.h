@@ -10,46 +10,51 @@
 #ifndef H_SimFireStringTools
 #define H_SimFireStringTools
 
-#include <iostream>
-
 #include <SimFireGlobals.h>
 
 namespace SimFire
 {
 
   extern const std::string gDefaultTrimChars;
+	//!< Default characters (whitespaces, crlf and so on) to be trimmed by Trim() function
 
   extern const char * gEmptyCharPtr;
+	//!< Pointer to empty c-string 
 
   extern const char * gTrueName;
+	//!< Constant strings for "true"
 
   extern const char * gFalseName;
+	//!< Constant strings for "false" 
 
   inline bool IsNumberChar( unsigned char ch ) { return ( 48 <= ch && ch <= 57 ); }
+	//!< \brief Returns <b>true</b> if the input character is a number (0-9).
 
   inline bool IsStandardChar( unsigned char ch )
   { return ( 64 <= ch && ch <= 90 ) || ( 97 <= ch && ch <= 122 ) || ch == '_'; }
+	//!< \brief Returns <b>true</b> if the input character is a standard character (A-Z, a-z, _).
 
-  //! Vrátí <b>true</b> je-li vstupní znak normální znak nebo číslice (0-9, A-Z, a-z, _).
   inline bool IsNormalChar( unsigned char ch ) { return IsNumberChar( ch ) || IsStandardChar( ch ); }
-
+  //!< \brief Returns <b>true</b> if the input character is a normal character or digit (0-9, A-Z, a-z, _).
+  
   inline bool IsEmpty( const char * str ) { return ( nullptr == str || 0 == *str ); }
-  //!< Vrátí true je-li řetězec prázdný (nullptr nebo začíná terminátorem)
+  //!< Returns true if the string is empty (nullptr or starts with a terminator)
 
   inline const char * NullEmptyStr( const char * val ) { return( nullptr == val ? gEmptyCharPtr : val ); }
   //!< Returns constant c-string pointer \e val or "" if \e val is nullptr
 
   NumberType_t IsNumeric( const char * str );
-  //!< Vrátí číselné možnosti výčtu TokenType_t, tj. Index, Hexa, Integer, Float nebo Complex.
-  //!  Pro rychlost nepoužívá regulární výrazy, ale pouze typy znaků v řetězci, tj. například
-  //!  řetězce "-10", "1-0" i "10-" budou vyhodnoceny jako Integer. Pro důkladnější kontrolu
-  //!  (např při implementaci validátorů na vstupu od uživatele) je třeba použít nějakou lepší
-  //!  metodu. Viz TokenType_t v ServiceEnumsFlags.h
+  //!< \brief Returns the type of a number in string form (see possibilities in NumberType_t). For higher
+  //!  performance, procedure does not use regular expressions, but only the character types in the string, 
+  //!  i.e. for example the strings "-10", "1-0" and "10-" will be evaluated as Integer. For more thorough 
+  //!  checking (e.g. when implementing validators on user input) some better method needs to be used. 
 
   int IsSeparator( char character, const char * separators );
-  //!< Zjistí, zda daný znak je obsažen v daném řetězci. Vrátí -1 pokud ho nenašel, jinak jeho index
+  //!< \brief  Determines whether the given character is contained in the given string. Returns -1 if not 
+  //!  found, otherwise its index
 
   bool IEquals( const std::string & a, const std::string & b );
+	//!< \brief Case insensitive comparison of two strings
 
   void Trim( 
     const char * strin, 
@@ -57,15 +62,38 @@ namespace SimFire
     size_t & last, 
     size_t len = 0,
     const std::string & chars = gDefaultTrimChars );
-  //!< Zjistí začátek a konec řetězce, ignorují-li se zadané znaky
+	/*!< \brief Trims the input c - string by finding all characters contained in \e strin from its beginning
+			 and end. Characters are not removed from the original string, only the indexes of the first and last
+			 non-trimmable characters are returned.
+
+			 \param[in] strin   Input c-string to be trimmed
+			 \param[out] first  Index of the first non-trimmable character
+			 \param[out] last   Index of the last non-trimmable character + 1
+			 \param[in] len     Length of the input string. If 0, the length is determined by strlen()
+			 \param[in] chars   String containing all characters to be trimmed */
+
 
   std::string & Trim( std::string & s, const std::string & chars = gDefaultTrimChars );
+  /*!< \brief Trims the input std::string by removing all characters contained in \e chars from its beginning
+			 and end. The original string is altered and a reference to it is returned.
+
+       \param[in,out] s     Input string to be trimmed
+       \param[in] chars     String containing all characters to be trimmed
+			 \return Reference to the trimmed string (allowing chains of calls) */
 
   bool StartsWith( std::string const & haystack, std::string const & needle );
-  //!< Vrátí <b>true</b> pokud c++ řetězec <i>haystack</i> začíná na C++ řetězec <i>needle</i>.
+  /*!< \brief Returns <b>true</b> if the C++ string <i>haystack</i> starts with the C++ string <i>needle</i>.
+      
+			 \param[in] haystack  The string to be searched
+			 \param[in] needle    The string to be found at the beginning of haystack
+			 \return <b>true</b> if <i>haystack</i> starts with <i>needle</i>, <b>false</b> otherwise */
 
   bool EndsWith( std::string const & haystack, std::string const & needle );
-  //!< Vrátí <b>true</b> pokud c++ řetězec <i>haystack</i> končí na C++ řetězec <i>needle</i>.
+  /*!< \brief Returns <b>true</b> if the C++ string <i>haystack</i> ends with the C++ string <i>needle</i>.
+      
+       \param[in] haystack  The string to be searched
+       \param[in] needle    The string to be found at the end of haystack
+			 \return <b>true</b> if <i>haystack</i> ends with <i>needle</i>, <b>false</b> otherwise */
 
   size_t Unescape( 
     std::string & data, 
@@ -96,7 +124,12 @@ namespace SimFire
   \param[in] trim         If <b>true</b>, trims all items by whitespace before storing them in the output */
 
   std::string JoinStrings( const StrVect_t & elements, const char * glue );
-  /*!< \brief Spojí řetězecový vektor do jednoho řetězce. Pro pospojování použije zadané znaky. */
+  /*!< \brief Joins an array of strings into a single string, with the specified glue string inserted
+       between each element.
+
+       \param[in] elements  Array of strings to be joined
+       \param[in] glue      Glue string to be inserted between elements
+			 \return Joined string */
 
   //****************************************************************************************************
 
@@ -133,15 +166,23 @@ namespace SimFire
   template <typename T>
   inline const char * format_argument_typecast( const T & value ) noexcept { return value; }
 
+  /*! \brief Formats a C++ string object using printf-style formatting. This function is little bit slow, as
+			it is neccessary to call snprintf twice (first to determine the size of the resulting string, second
+			to actually format it), but it is used mainly for loggin and error messages, where speed is not
+			that important.
+  
+       \param[in] format  Format string (as in printf)
+       \param[in] args    Arguments to be formatted
+			 \return Formatted string */
   template<typename... Args>
   std::string FormatStr( const std::string & format, const Args&... args )
   {
     size_t size = snprintf( nullptr, 0, format.c_str(), format_argument_typecast( args )... ) + 1;
-    // Spočítá se výsledná délka a přidá místo navíc pro terminátor
+    // The resulting length is calculated and an extra space is added for the terminator.
 
     std::unique_ptr<char[]> buf( new char[size] );
     snprintf( buf.get(), size, format.c_str(), format_argument_typecast( args )... );
-    // Teď už ale terminátor v řetězci nechceme
+    // But now we don't want a terminator in the chain
 
     return std::string( buf.get(), buf.get() + size - 1 );
   } /*FormatStr*/

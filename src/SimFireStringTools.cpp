@@ -7,6 +7,7 @@
 //* 19. 11. 2025, V. Pospíšil, gdermog@seznam.cz                                                     *                   
 //****************************************************************************************************
 
+
 #include <cctype>    
 #include <algorithm> 
 
@@ -42,7 +43,7 @@ namespace SimFire
     s.erase( 0, s.find_first_not_of( chars ) );
     s.erase( s.find_last_not_of( chars ) + 1 );
     return s;
-  } /*Trim*/
+  } // Trim
 
   //****************************************************************************************************
 
@@ -50,15 +51,15 @@ namespace SimFire
   {
     if( needle.size() > haystack.size() ) return false;
     return std::equal( needle.begin(), needle.end(), haystack.begin() );
-  } /*StartsWith*/
+  } // StartsWith
 
-    //****************************************************************************************************
+  //****************************************************************************************************
 
   bool EndsWith( std::string const & haystack, std::string const & needle )
   {
     if( needle.size() > haystack.size() ) return false;
     return std::equal( needle.rbegin(), needle.rend(), haystack.rbegin() );
-  } /*clib_endswith*/
+  } // EndsWith
 
   //****************************************************************************************************
 
@@ -96,7 +97,7 @@ namespace SimFire
 
     return escapedChars;
 
-  } /*Unescape*/
+  } // Unescape
 
   //****************************************************************************************************
 
@@ -216,12 +217,12 @@ namespace SimFire
     if( lineLength < 1 )
       return;
 
-    size_t beg = 0;      // Začátek načítané položky (index v řetězci)
-    size_t strLoop;      // Řídící proměnná vyhledávacího cyklu
-    size_t len;          // Délka nalezeného slova
-    bool isItem = false; // Momentálně se čte/nečte položka
+    size_t beg = 0;     // Start of the item being loaded (index in the string)
+    size_t strLoop;     // Search cycle control variable
+    size_t len;         // Length of the found word
+    bool isItem = false;// Item currently being read/not being read
     int isUnseparable = -1;
-    // Momentálně se ignorují/neignorují oddělovače položek (kvůli uvozovkám)
+                        // Currently ignoring/not ignoring item separators (due to quotes)
 
     size_t first, last;
 
@@ -229,49 +230,51 @@ namespace SimFire
     {
       if( isUnseparable >= 0 && line[strLoop] == '\\' &&
         IsSeparator( line[strLoop + 1], glues ) >= 0 ) continue;
-      // Pokud je část řetězce v uvozovkách, očekává se, že znaky uvnitř
-      // jsou escapované, tj. např. dvojznak \" nesmí ukončit sekvenci s uvozovkami
+                        // If part of a string is in quotes, the characters inside are expected       
+                        // to be escaped, i.e., for example, a double character \" must not end 
+                        // the sequence with quotes
 
       if( isUnseparable < 0 && IsSeparator( line[strLoop], separators ) >= 0 )
-      {                 // Nalezen oddělovací znak
+      {                 // Separator character found
         if( isItem )
-        {              // Zrovna se načítá položka - je tedy nutné její načítání ukončit.
+        {               // An item is currently reading - it is therefore necessary to stop read.
           len = strLoop - beg;
 
           if( trim )
-          {           // Zjistí začátek a konec řetězce bez bílých znaků
+          {             // Finds the beginning and end of a string without whitespace characters
             Trim( line + beg, first, last, len );
             beg += first; len = last - first;
           } // if
 
           output.emplace_back( line + beg, len );
-          // Uloží se řetězec položky
+                        // The item string is stored.
 
           isItem = false;
-          // Načítání položky je u konce
+                        // Item loading is complete.
         } // if
         else
         {
           if( leaveBlanks ) output.emplace_back();
           continue;
         } // else
-                    // Přeskočí oddělovací znak
+                        // Skips separator character
       } // if
       else
-      {              // Nalezen běžný znak
+      {                 // Common character found
 
         auto tmpSep = IsSeparator( line[strLoop], glues );
         if( tmpSep >= 0 )
-        {           // Pokud je načtený znak lepidlový, začíná nedělitelnou sekvenci nebo ji
-                    // ukončuje (to ale musí být shodný jako uvozující).
+        {               // If the loaded character is a glue character, it starts 
+                        //or ends a non-separable sequence (but it must be the same
+                        // as the leading one).
           if( isUnseparable < 0 ) isUnseparable = tmpSep;
           else if( isUnseparable == tmpSep ) isUnseparable = -1;
         } // if
 
         if( isItem ) continue;
-        // Zrovna se načítá položka - další znak položky nalezen.
+                        // Loading item - next item character found.
         else
-        {           // Položka se nenačítá - je nutné její načítání zahájit.
+        {               // The item is not loading - you need to start loading it.
           beg = strLoop;
           isItem = true;
           continue;
@@ -280,11 +283,11 @@ namespace SimFire
     } // for
 
     if( isItem )
-    {                 // Pokud řádek skončil při načítání poslední položky, je třeba ji zapsat.
+    {                   // If the line ended when the last item was loaded, it needs to be written out.
       len = strLoop - beg;
 
       if( trim )
-      {              // Zjistí začátek a konec řetězce bez bílých znaků
+      {                 // Finds the beginning and end of a string without whitespace characters
         Trim( line + beg, first, last, len );
         beg += first; len = last - first;
       } // if

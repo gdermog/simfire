@@ -12,6 +12,7 @@
 
 #include <entity/registry.hpp>
 
+#include <SimFireGlobals.h>
 #include <CSimFireSettings.h>
 #include <CSimFireSingleRunParams.h>
 
@@ -20,9 +21,7 @@ namespace SimFire
 
   //***** CSimFireSingleRun *****************************************************************************
 
-	/*!  \brief This class handles a single simulation run.
-
-  */
+	/*!  \brief This class handles a single simulation run. */
   class CSimFireSingleRun
   {
 

@@ -1,6 +1,6 @@
 //****************************************************************************************************
 //! \file CSimFireSCVExporter.cpp                                                                       
-//! Module contains declaration of CSimFireSCVExporter class, which exports state of single simulation
+//! Module contains declaration of CSimFireSCVExporter class, which exports progress of single simulation
 //! run into CSV file.                                
 //****************************************************************************************************
 //                                                                                                  

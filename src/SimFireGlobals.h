@@ -10,6 +10,10 @@
 #ifndef H_SimFireGlobals
 #define H_SimFireGlobals
 
+#include <cmath> 
+#include <cstdint> 
+#include <string>
+#include <memory>
 #include <vector>
 #include <set>
 #include <map>
@@ -33,19 +37,17 @@ namespace SimFire
   using StrMap_t = std::map<std::string, T>;
   //!< Map indexed by string
 
-  //! Typy tokenů (např. při čtení z řetězce)
+  //! Number types
   enum class NumberType_t: unsigned short
   {
-    kNothing            = 0x0000,
-    kWhitespace         = 0x0001,
-    kIndexNumeric       = 0x0002,
-    kIntegerNumeric     = 0x0004,
-    kHexaNumeric        = 0x0008,
-    kFloatNumeric       = 0x0010,
-    kScientificNumeric  = 0x0020,
-    kComplexNumeric     = 0x0040,
+    kNothing            = 0,
+    kIndexNumeric       = 1,
+    kIntegerNumeric     = 2,
+    kHexaNumeric        = 3,
+    kFloatNumeric       = 4,
+    kScientificNumeric  = 5,
+    kComplexNumeric     = 6,
   };
-
 
   constexpr double_t gAlmostZero = 1E-12;
   //!< Specifies the size of a number that is already considered zero

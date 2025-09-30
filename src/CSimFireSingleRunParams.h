@@ -1,6 +1,7 @@
 //****************************************************************************************************
 //! \file CSimFireSingleRunParams.h                                                                        
-//! Module contains declaration of CSimFireSingleRunParams class, which ...                                
+//! Module contains declaration of CSimFireSingleRunParams class, which describes parameters and 
+//! results of a single simulation run.                                
 //****************************************************************************************************
 //                                                                                                  
 //****************************************************************************************************
@@ -12,21 +13,15 @@
 
 #include <iostream>
 
+#include <SimFireGlobals.h>
 #include <CSimFireConfig.h>
-#include <string>
 
 namespace SimFire
 {
 
   //***** CSimFireSingleRunParams *****************************************************************************
 
-  /*!  \brief Brief description of the class
-
-  Detailed description of the class \n\n
-
-  <b>Remark.:</b> ...
-
-  */
+  /*!  \brief Class describes parameters and results of a single simulation run. */
   class CSimFireSingleRunParams
   {
 
@@ -56,23 +51,37 @@ namespace SimFire
    //@{-----------------------------------------------------------------------------------------------
 
     std::ostream & Preprint( std::ostream & out = std::cout );
+    /*!< \brief Sends all parameters and results to given output stream
+   
+         \param[in,out] out Output stream, default is std::cout */
 
     static const std::string & GetStrValue( SimResCode_t code );
+    /*!< \brief Returns string representation of given simulation result code.
+   
+         \param[in] code Simulation result code
+         \return String representation of the code */
 
     std::string GetRunDesc();
+    /*!< \brief Returns brief description of the run (identifier and velocity coefficients).
+   
+         \return String description of the run */
 
     void Reset( bool inclVelCoefs = true );
+    /*!< \brief Resets all output values to initial state. If inclVelCoefs is true, also input  
+         velocity coefficients are reset to zero.
+   
+         \param[in] inclVelCoefs If true, also input velocity coefficients are reset to zero. */
 
     //@{}---------------------------------------------------------------------------------------------
     //! @name Public data                                                                            
     //@{----------------------------------------------------------------------------------------------
 
-    std::string mRunIdentifier;  //!< Simulation run identifier
+    std::string mRunIdentifier;   //!< Simulation run identifier
     std::string mThreadIdentifier;//!< Identifier of the thread that processed this run
 
-    double_t mVelocityXCoef;     //!< X aim of the shooter
-    double_t mVelocityYCoef;     //!< Y aim of the shooter
-    double_t mVelocityZCoef;     //!< Z aim of the shooter
+    double_t mVelocityXCoef;      //!< X aim of the shooter
+    double_t mVelocityYCoef;      //!< Y aim of the shooter
+    double_t mVelocityZCoef;      //!< Z aim of the shooter
 
     //@}----------------------------------------------------------------------------------------------
     //! @name Public output data                                                                            
@@ -86,10 +95,12 @@ namespace SimFire
 
     double_t mSimTime;  //!< Total simulation time [s]
     SimResCode_t mReturnCode;
+                        //!< Result code of the simulation run
 
   protected:
 
     std::ostream & PrpLine( std::ostream & out );
+    //!< \brief Helper function for Preprint(), starts one line of output
 
     //@}
 

@@ -145,6 +145,10 @@ namespace SimFire
 
     uint32_t GetMaxGenerations() const { return mMaxGenerations; }
     //!< \brief Returns maximum number of generations (genetic algorithm)
+    
+    double_t GetIniZCoef() const { return mIniZCoef; }
+    //!< \brief Returns initial Z velocity coefficient (used for initial generation of runs)
+    
 
   protected:
 
@@ -196,6 +200,7 @@ namespace SimFire
     uint32_t mMaxGenerations;
                         //!< Maximum number of generations (for genetic algorithms)
 
+    double_t mIniZCoef; //!< Initial Z velocity coefficient (used for initial generation of runs)
 
     std::ostream & PrpLine( std::ostream & out );
 		/*!< \brief Helper for formatting output in Preprint method */

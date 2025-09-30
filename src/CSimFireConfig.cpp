@@ -8,7 +8,7 @@
 //****************************************************************************************************
 
 #include <iomanip>
-#include <string>
+#include <iostream>
 #include <regex>
 
 #include <SimFireStringTools.h>
@@ -72,7 +72,6 @@ namespace SimFire
      std::string lastKey;
      std::vector<std::string> lastVal;
      std::string lastValJoined;
-     //std::string actToken;
 
      StrVect_t splittedLine;
 
@@ -83,15 +82,15 @@ namespace SimFire
        {
 
          SplitLine( splittedLine, argv[loop], mSeparators, mGlues, false, true);
-         // Tokenizer dismantles strings returned by OS. On the commandline there is
-         // usually only space character designated as delimiter, but we need also
-         // ';', ',' and '|' delimiters.
+                        // Tokenizer dismantles strings returned by OS. On the commandline there is
+                        // usually only space character designated as delimiter, but we need also
+                        // ';', ',' and '|' delimiters.
 
          for( auto & tIter : splittedLine )
          {
 
            Unescape( tIter );
-           // Any metacharacters should be transformed to apropriate special chars
+                        // Any metacharacters should be transformed to apropriate special chars
 
            bool dblM = StartsWith( tIter, "--" );
            bool snglM = StartsWith( tIter, "-" );
@@ -139,7 +138,7 @@ namespace SimFire
        if( !lastKey.empty() )
        {
          if( lastVal.empty() )
-         {             // check if its not just an argument (true false value for --help)
+         {              // check if its not just an argument (true false value for --help)
            lastVal.emplace_back( gTrueName );
            if( !InsertItem( {}, lastKey, { gTrueName } ) )
              return false;
@@ -155,13 +154,13 @@ namespace SimFire
      } /*try*/
      catch( std::exception & e )
      {
-       std::cerr << "Error reading command line parameters, quitting:" << std::endl;
-       std::cerr << "  -> " << e.what() << std::endl;
+       std::cout << "Error reading command line parameters, quitting:" << std::endl;
+       std::cout << "  -> " << e.what() << std::endl;
        exit(-1);
      } // catch
      catch( ... )
      {
-       std::cerr << "Error reading command line parameters, quitting" << std::endl;
+       std::cout << "Error reading command line parameters, quitting" << std::endl;
        exit( -1 );
      } // catch
 

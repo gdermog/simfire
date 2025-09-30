@@ -1,7 +1,7 @@
 //****************************************************************************************************
 //! \file CSimFireSingleRunParams.cpp                                                                        
 //! Module contains definitions of CSimFireSingleRunParams class, declared in CSimFireSingleRunParams.h, 
-//! which ...    
+//! which describes parameters and results of a single simulation run.    
 //****************************************************************************************************
 //                                                                                                 
 //****************************************************************************************************
@@ -13,11 +13,10 @@
 #include <SimFireStringTools.h>
 #include <CSimFireSingleRunParams.h>
 
-
 namespace SimFire
 {
 
-   //****** CCSimFireSingleRunParams **************************************************************************
+   //****** CCSimFireSingleRunParams *****************************************************************
 
    CSimFireSingleRunParams::CSimFireSingleRunParams():
      mRunIdentifier(),

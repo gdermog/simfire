@@ -28,7 +28,7 @@ the Entity–component–system architecture is used by utilizing EnTT library.
 The second part then performs simulated shots and searches for an initial barrel 
 direction which will hit the target at a fixed muzzle velocity. This part uses 
 a genetic algorithm to find a solution. To increase performance simulations of individual 
-shots within one generation in run parallel by standard C++ multi-threading tools.
+shots within one generation are run parallel by standard C++ multi-threading tools.
 
 ## Time discretization method - basic idea
 
@@ -101,11 +101,13 @@ Specifically, the components used are:
 
   - **procURM**: uniform rectilinear motion, updates the position of entities according to their velocity
   - **procDVA**: calculates change in velocity according to gravitational acceleration
+  - **procADRG**: calculates change in velocity according to drag force
   - **procOCC**: detects collisions between entities
   - **procOCS**: detects collisions of entities with the terrain (ground plane at z=0)
   - **procActCheck**: informs main loop if there are still active entities (bullet in flight)
 
-  ESC is implemented using [EnTT](https://github.com/skypjack/entt) library.
+  [ESC](https://en.wikipedia.org/wiki/Entity_component_system) is implemented using 
+  [EnTT](https://github.com/skypjack/entt) library.
 
   The outlined approach allows for easy expansion of the simulation with additional possible 
   moving objects and stationary bodies - these can be added to the scene using the EnTT library 
@@ -113,17 +115,16 @@ Specifically, the components used are:
 
   ## Genetic algorithm - basic idea
 
-  Genetic algorithms are search heuristics that use concepts of biological evolution, such as natural
-  selection and genetics, to find optimal or near-optimal solutions to complex problems. They begin
-  with a population of random candidate solutions (chromosomes), which are then iteratively improved 
+  Genetic algorithms are inb general means of heuristic search that use concepts of biological evolution, 
+  such as natural selection and genetics, to find optimal or near-optimal solutions to complex problems. 
+  They begin with a population of random candidate solutions (chromosomes), which are then iteratively improved 
   through a process of fitness evaluation, selection of the fittest, and genetic operations like crossover 
   (combining traits from two parents) and mutation (random changes), ultimately evolving towards better 
   solutions.  
 
   How Genetic Algorithms Work:
 
-  - **Initialization**: The process starts with a population of candidate solutions, often represented 
-    as strings of numbers or bits (chromosomes), generated randomly. 
+  - **Initialization**: The process starts with a population of candidate solutions), generated randomly. 
   - **Fitness Evaluation**: A fitness function evaluates each solution in the population, assigning it 
     a score that indicates how well it solves the problem. 
   - **Selection**: Solutions with higher fitness values are selected for reproduction, mimicking "survival 
@@ -191,11 +192,11 @@ downgraded in the project properties if necessary.
 
 Simulation parameters are specified in the configuration INI file. The program requires the path to this file as
 the value of the command line parameter **--setup**. Another possible command line parameter is **--help**. 
-Everything else is set in the INI file (see directory /data in the repository for examples).
+Everything else is set in the INI file (see directory **/data** in the repository for examples).
 
 ## Output check
 
-Test runs can be exported to a CSV file for data review (see data/sim_test_simple.ini for more information). 
+Test runs can be exported to a CSV file for data review (see **data/sim_test_simple.ini** for more information). 
 For a simple visual overview, one can use gnuplot with a pre-prepared script **showshoot.gpl** using 
 following command:
 

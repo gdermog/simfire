@@ -114,33 +114,36 @@ namespace SimFire
   struct procADRG {
 
     procADRG(double_t dt, double_t dens ) :
-      mDens( dens ),
-			mDt( dt )
+      mTDCoef( dt * 0.5 * dens )
     {}
 
-		double_t mDens;			 //!< Air density [kg/m^3]
-    double_t mDt;        //!< Time step
+		double_t mTDCoef;		//!< time step  * ( 1/2 * Air density )
 
     void reset() {}
 
     void update(entt::registry& reg)
-    {                    // Drag equation is Fd = 1/2 * rho * v^2 * cd * A,
-                         // where rho is air density, v is velocity magnitude, cd is drag coefficient 
-                         // and A is cross-sectional area. The drag force acts in the direction opposite
-                         // to the velocity vector. The acceleration due to drag is a = Fd/m, where m
-												 // is mass of the object. See https://en.wikipedia.org/wiki/Drag_equation.
+    {                   // Drag equation is Fd = 1/2 * rho * v^2 * cd * A,
+                        // where rho is air density, v is velocity magnitude, cd is drag coefficient 
+                        // and A is cross-sectional area. The drag force acts in the direction opposite
+                        // to the velocity vector. The acceleration due to drag is a = Fd/m, where m
+												// is mass of the object. See https://en.wikipedia.org/wiki/Drag_equation.
 
-      if( ! IsPositive( mDens ) )
+      if( ! IsPositive( mTDCoef ) )
 				return;         // No air resistance in vacuum
 
       auto view = reg.view<cpVelocity, cpGeometry, cpPhysProps>();
 
       view.each([=](auto & v, auto & geom, auto &prop )
         {
-					double_t commonCoef = mDt * ( 0.5 * mDens * prop.Cd * geom.crossSection / prop.mass );
-          v.vX -= commonCoef * v.vX * v.vX;
-					v.vY -= commonCoef * v.vY * v.vY;
-					v.vZ -= commonCoef * v.vZ * v.vZ;
+          double_t actV = v.vX * v.vX + v.vY * v.vY + v.vZ * v.vZ;
+          double_t deltaV = mTDCoef * prop.Cd * geom.crossSection * actV / prop.mass;
+          actV = std::sqrt( actV );
+
+          double_t commonCoef = ( actV - deltaV ) / actV;
+
+          v.vX *= commonCoef;
+					v.vY *= commonCoef;
+					v.vZ *= commonCoef;
         });
 
     } // procDVA::update
