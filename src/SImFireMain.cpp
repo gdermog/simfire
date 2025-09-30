@@ -12,9 +12,11 @@
 #include <filesystem>
 
 #include <SimFireGlobals.h>
+#include <SimFireStringTools.h>
 #include <CSimFireConfig.h>
 #include <CSimFireSettings.h>
 #include <CSimFireCore.h>
+#include <CSimFireCSVExporter.h>
 
 //******* Command line help **************************************************************************
 
@@ -116,7 +118,7 @@ int main( int argc, char * argv[] )
 
   if (settings.GetDoTestRun())
   {
-    SimFire::CSimFireSingleRun run(settings,
+    SimFire::CSimFireSingleRun runWorker(settings,
       [](const std::string& id, const std::string& mssg)
       {
          std::cout << "[" << id << "]   " << mssg << std::endl;
@@ -124,8 +126,11 @@ int main( int argc, char * argv[] )
     );
 
     SimFire::CSimFireSingleRunParams runPars;
-    runPars.mRunIdentifier = "SIMPLE";
+    runPars.mRunIdentifier = "TRUN";
     runPars.mThreadIdentifier = "Main";
+
+    SimFire::CSimFireCSVExporter csvExporter( settings );
+    auto& csvTemplate = settings.GetCSVExportTemplate();
 
     std::cout << asteriskLine << std::endl;
     std::cout << "Test run: " << std::endl;
@@ -138,6 +143,12 @@ int main( int argc, char * argv[] )
 
     std::vector<SimFire::CSimFireSingleRunParams> allHits;
 
+    if (settings.ExportRunsToCSV() && !settings.GetCSVHitsOnly())
+    {
+      runWorker.SetExportCallback(
+        BIND_SINGLE_RUNEXPORT_CALLBACK(&csvExporter, SimFire::CSimFireCSVExporter::DoExportState));
+    } // if
+
     for (uint32_t step = 0; step < settings.GetAimZSteps(); ++step, zAct += increment )
     {
 			runPars.Reset();
@@ -146,22 +157,51 @@ int main( int argc, char * argv[] )
       runPars.mVelocityYCoef = settings.GetAimY();
 			runPars.mVelocityZCoef = zAct;
 
-      run.Run( runPars );
+      if( settings.ExportRunsToCSV() && !settings.GetCSVHitsOnly() )
+      {
+        // Template example:  simTest_%s_%04u_%.3f.csv
+        auto csvFileName = SimFire::FormatStr(csvTemplate.c_str(),
+          settings.GetSimIdentifier() + "_" + runPars.mRunIdentifier,
+          (unsigned)settings.GetVelocity(), runPars.mVelocityZCoef);
+        csvExporter.NewFile(csvFileName);
+      } // if
+
+      runWorker.Run( runPars );
       std::cout << "Test " << runPars.GetRunDesc() << " ended with code "
         << SimFire::CSimFireSingleRunParams::GetStrValue(runPars.mReturnCode) << std::endl;
       if (runPars.mReturnCode == SimFire::CSimFireSingleRunParams::SimResCode_t::kError)
         res = false;
       else if (runPars.mReturnCode == SimFire::CSimFireSingleRunParams::SimResCode_t::kEndedCollision)
 				allHits.push_back(runPars);
-    }
+		} // for
 
     std::cout << std::endl << asteriskLine << std::endl;
     std::cout << "Hits " << std::endl;
     std::cout << asteriskLine << std::endl << std::endl;
 
+    if( settings.ExportRunsToCSV() && settings.GetCSVHitsOnly() )
+    {
+      runWorker.SetExportCallback(
+        BIND_SINGLE_RUNEXPORT_CALLBACK( &csvExporter, SimFire::CSimFireCSVExporter::DoExportState ) );
+    } // if
+
+		uint32_t hitNr = 0;
     for( auto & hit : allHits )
     {
       std::cout << hit.GetRunDesc() << std::endl;
+
+      if( settings.ExportRunsToCSV() && settings.GetCSVHitsOnly() )
+      {
+        // Template example:  simTest_%s_%04u_%.3f.csv
+        auto csvFileName = SimFire::FormatStr( csvTemplate.c_str(),
+          settings.GetSimIdentifier() + "_" + hit.mRunIdentifier,
+          ++hitNr, hit.mVelocityZCoef );
+        csvExporter.NewFile( csvFileName );
+
+        hit.Reset( false );
+				runWorker.Run( hit );
+      } // if
+
 		}
 
   }

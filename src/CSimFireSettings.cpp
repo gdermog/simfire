@@ -86,6 +86,8 @@ namespace SimFire
        mAimZStart = inCfg.GetValueDouble( "test", "aimZStart", 0.0 );
 			 mAimZEnd = inCfg.GetValueDouble( "test", "aimZEnd", 0.0 );
 			 mAimZSteps = (uint32_t)inCfg.GetValueUnsigned("test", "aimZSteps", 1);
+			 mCSVExportTemplate = inCfg.GetValueStr( "test", "csvExportTemplate", "" );
+			 mCSVHitsOnly = inCfg.GetValueBool( "test", "csvHitsOnly", true );
 
        mGunX = inCfg.GetValueDouble( "gun", "x", 0.0 );
        mGunY = inCfg.GetValueDouble( "gun", "y", 0.0 );
@@ -161,7 +163,9 @@ namespace SimFire
        PrpLine(out) << "AimY" << mAimY << std::endl;
        PrpLine(out) << "AimZStart" << mAimZStart << std::endl;
        PrpLine(out) << "AimZEnd" << mAimZEnd << std::endl;
-       PrpLine(out) << "AimZSteps" << mAimZSteps << std::endl << std::endl;
+       PrpLine(out) << "AimZSteps" << mAimZSteps << std::endl;
+       PrpLine(out) << "mCSVExportTemplate" << mCSVExportTemplate << std::endl;
+       PrpLine(out) << "mCSVHitsOnly" << mCSVHitsOnly << std::endl << std::endl;
      }
 
      PrpLine( out ) << "GunX" << mGunX << " m" << std::endl;

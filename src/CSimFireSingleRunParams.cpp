@@ -63,11 +63,14 @@ namespace SimFire
 
    //-------------------------------------------------------------------------------------------------
 
-   void CSimFireSingleRunParams::Reset()
+   void CSimFireSingleRunParams::Reset( bool inclVelCoefs )
    {
-     mVelocityXCoef = 1.0;
-     mVelocityYCoef = 0.0;
-     mVelocityZCoef = 1.0;
+     if( inclVelCoefs )
+     {
+       mVelocityXCoef = 1.0;
+       mVelocityYCoef = 0.0;
+       mVelocityZCoef = 1.0;
+		 } // if
      mMinDTgtSq = 1e99;
      mMinTime = 0.0;
      mSimTime = 0.0;

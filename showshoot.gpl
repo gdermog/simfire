@@ -1,0 +1,10 @@
+set terminal wxt size 800,600 
+
+set title "Bullet trajectory in XY vs. Z plane"
+set xlabel "XY [m]"
+set ylabel "Z [m]"
+
+set datafile separator ";"
+set datafile columnheader
+plot INPUTFILE using "XY [m]":"Z [m]" with lines title "Trajectory"
+pause mouse close

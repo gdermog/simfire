@@ -48,6 +48,8 @@ namespace SimFire
 
   struct cpGeometry {
     double_t radius;    //!< Radius of the sphere (ideal shape) [m]
+		double_t crossSection; 
+                        //!< Cross-sectional area of the sphere [m^2]
   };
 
   //****** component: physical properties ************************************************************
@@ -106,6 +108,44 @@ namespace SimFire
 
     } // procDVA::update
   }; // procDVA
+
+	//****** processor: aplication of aerodynamic drag ************************************************
+
+  struct procADRG {
+
+    procADRG(double_t dt, double_t dens ) :
+      mDens( dens ),
+			mDt( dt )
+    {}
+
+		double_t mDens;			 //!< Air density [kg/m^3]
+    double_t mDt;        //!< Time step
+
+    void reset() {}
+
+    void update(entt::registry& reg)
+    {                    // Drag equation is Fd = 1/2 * rho * v^2 * cd * A,
+                         // where rho is air density, v is velocity magnitude, cd is drag coefficient 
+                         // and A is cross-sectional area. The drag force acts in the direction opposite
+                         // to the velocity vector. The acceleration due to drag is a = Fd/m, where m
+												 // is mass of the object. See https://en.wikipedia.org/wiki/Drag_equation.
+
+      if( ! IsPositive( mDens ) )
+				return;         // No air resistance in vacuum
+
+      auto view = reg.view<cpVelocity, cpGeometry, cpPhysProps>();
+
+      view.each([=](auto & v, auto & geom, auto &prop )
+        {
+					double_t commonCoef = mDt * ( 0.5 * mDens * prop.Cd * geom.crossSection / prop.mass );
+          v.vX -= commonCoef * v.vX * v.vX;
+					v.vY -= commonCoef * v.vY * v.vY;
+					v.vZ -= commonCoef * v.vZ * v.vZ;
+        });
+
+    } // procDVA::update
+
+  };
 
   //****** processor: object collision check *********************************************************
 
@@ -223,6 +263,7 @@ namespace SimFire
     LogCallback_t fnCall ):
     mSettings( settings ),
     mLogCallback( fnCall ),
+		mExportCallback(nullptr),
     mRunId(),
     mEnTTRegistry()
   {} 
@@ -281,8 +322,10 @@ namespace SimFire
 
     mEnTTRegistry.emplace<cpGeometry>(
       bullet,
-      mSettings.GetBulletSize() );
+      mSettings.GetBulletSize(),
+      gPI * mSettings.GetBulletSize() * mSettings.GetBulletSize() );
                         // Proximity of the bullet and target is given by distance of centres.
+												// Atmospheric drag depends on cross-sectional area of the bullet.
 
     mEnTTRegistry.emplace<cpPhysProps>(
       bullet,
@@ -325,6 +368,7 @@ namespace SimFire
 
     procURM uniformRectilinearMotionProcessor( mSettings.GetDt() );
     procDVA deltaVelocityAccelerationProcessor( mSettings.GetDt(), mSettings.GetG() );
+		procADRG deltaVelocityDragProcessor(mSettings.GetDt(), mSettings.GetDensity() );
     procOCC objectCollisionCheckProcessor;
     procOCS outOfSceneProcessor;
     procActCheck activityCheckProcessor;
@@ -371,6 +415,9 @@ namespace SimFire
     {
       uniformRectilinearMotionProcessor.reset();
       uniformRectilinearMotionProcessor.update( mEnTTRegistry );
+
+			deltaVelocityDragProcessor.reset();
+      deltaVelocityDragProcessor.update(mEnTTRegistry);
 
       deltaVelocityAccelerationProcessor.reset();
       deltaVelocityAccelerationProcessor.update( mEnTTRegistry );
@@ -425,8 +472,9 @@ namespace SimFire
 
       //------ Tick increment and logging ------------------------------------------------------------
 
+			bool logNow = (nullptr != mLogCallback && 0 < logTicks && 0 == (actualTick % logTicks));
 
-      if( nullptr != mLogCallback && 0 < logTicks && 0 == ( actualTick % logTicks ) )
+      if( nullptr != mExportCallback || logNow )
       {
 
         auto view = mEnTTRegistry.view<const cpId, const cpPosition, const cpVelocity>();
@@ -435,15 +483,30 @@ namespace SimFire
         double bRefVal = nVectNear.X * pos.X + nVectNear.Y * pos.Y + nVectNear.Z * pos.Z + dConstNear;
         bool nearHalfPlane = ( referenceValueNearNegative ? ( bRefVal < 0.0 ) : ( bRefVal > 0.0 ) );
 
-        std::string mssg = FormatStr( "In t = %.4f: Bullet pos = [%.3f, %.3f, %.3f], v = [%.3f, %.3f, %.3f], %s, %s, %s",
-          actSimTime,
-          pos.X, pos.Y, pos.Z,
-          vel.vX, vel.vY, vel.vZ,
-          ( nearHalfPlane ? "near" : "far" ),
-          ( pos.Z < targetPos.Z ? "under" : "above" ),
-          ( vel.vZ < 0.0 ? "falling" : "raising" ) );
+        if( nullptr != mExportCallback )
+        {
+          mExportCallback(
+            pos.X, pos.Y, pos.Z,
+            vel.vX, vel.vY, vel.vZ,
+            std::sqrt( tgtToBulletDistSq ),
+            actSimTime,
+            ( vel.vZ >= 0.0 ),
+            ( pos.Z < targetPos.Z ),
+						nearHalfPlane);
+        }
 
-        mLogCallback( runParams.mThreadIdentifier + ":" + mRunId, mssg );
+        if (logNow)
+        {
+          std::string mssg = FormatStr("In t = %.4f: Bullet pos = [%.3f, %.3f, %.3f], v = [%.3f, %.3f, %.3f], %s, %s, %s",
+            actSimTime,
+            pos.X, pos.Y, pos.Z,
+            vel.vX, vel.vY, vel.vZ,
+            (nearHalfPlane ? "near" : "far"),
+            (pos.Z < targetPos.Z ? "under" : "above"),
+            (vel.vZ < 0.0 ? "falling" : "raising"));
+
+          mLogCallback(runParams.mThreadIdentifier + ":" + mRunId, mssg);
+        }
       } // if
 
       ++actualTick;

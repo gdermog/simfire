@@ -61,7 +61,7 @@ namespace SimFire
 
     std::string GetRunDesc();
 
-    void Reset();
+    void Reset( bool inclVelCoefs = true );
 
     //@{}---------------------------------------------------------------------------------------------
     //! @name Public data                                                                            

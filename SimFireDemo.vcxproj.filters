@@ -81,6 +81,9 @@
     <ClCompile Include="src\CSimFireSingleRunParams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\CSimFireCSVExporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CSimFireSettings.h">
@@ -335,6 +338,9 @@
     <ClInclude Include="src\CSimFireSingleRunParams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\CSimFireCSVExporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\sim_test.ini">
@@ -345,6 +351,9 @@
     </None>
     <None Include="README.md">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="data\sim_test_simple_vacuum.ini">
+      <Filter>data</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

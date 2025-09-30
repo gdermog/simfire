@@ -1,0 +1,20 @@
+# Nastavení výstupního terminálu (např. png, jpeg, eps, svg, wxt, qt, atd.)
+# Pro interaktivní zobrazení použijte "wxt" nebo "qt"
+set terminal wxt size 800,600  # Nebo qt, pokud máte qt nainstalováno
+
+# Nastavení výstupního souboru (pokud chcete graf uložit do souboru)
+# set output "trajektorie.png"
+
+# Titulek grafu
+set title "Projekce 3D pohybu do 2D"
+
+# Popisky os
+set xlabel "XY [m]"
+set ylabel "Z [m]"
+
+# Nastavení rozsahu os (volitelné, ale může zlepšit čitelnost)
+# set xrange [0:10]
+# set yrange [0:10]
+
+# Vykreslení dat
+plot "data.csv" using 3:4 with linespoints title "Trajektorie"

@@ -77,6 +77,15 @@ namespace SimFire
 		uint32_t GetAimZSteps() const { return mAimZSteps; }
 		//!< \brief Returns number of steps between start and end [-]
     
+		bool ExportRunsToCSV() const { return !mCSVExportTemplate.empty(); }
+		//!< \brief Returns true if CSV export is enabled
+
+		const std::string & GetCSVExportTemplate() const { return mCSVExportTemplate; }
+		//!< \brief Returns template for CSV export file name. If empty, no export is done.
+
+		bool GetCSVHitsOnly() const { return mCSVHitsOnly; }
+		//!< \brief Returns true if only hits are exported to CSV file
+    
     double_t GetGunX() const { return mGunX; }
     //!< \brief Returns X position of the shooter [m]
 
@@ -151,8 +160,10 @@ namespace SimFire
     double_t mAimY;     //!< Aiming coefficient Y[-]
     double_t mAimZStart;//!< Aiming coefficient Z, start[-]
     double_t mAimZEnd;  //!< Aiming coefficient Z, start[-]
-    uint32_t mAimZSteps; //!< Number of steps between start and end [-]
-
+    uint32_t mAimZSteps;//!< Number of steps between start and end [-]
+    std::string mCSVExportTemplate;
+                        //!< Template for CSV export file name, if empty, no export is done
+		bool mCSVHitsOnly;  //!< If true, only hits are exported to CSV file
 
     double_t mGunX;     //!< X position of the shooter [m]
     double_t mGunY;     //!< Y position of the shooter [m]

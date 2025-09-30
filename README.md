@@ -139,11 +139,12 @@ Specifically, the components used are:
 ## Evolutionary algorithm in SimFire
 
 Applying a evolutionary algorithm to a simple ballistics case may seem like using a sledgehammer to crack  
-a nut, but this approach allows the simulation to be expanded arbitrarily to include other perturbations, 
-such as wind, inhomogeneity of the gravitational field, inhomogeneity of the density of the environment,
-and so on. The algorithm does not need to be changed after adding such complications, it will continue to 
-function. It is only necessary to ensure that the system does not become 
-[chaotic](https://en.wikipedia.org/wiki/Chaos_theory) with the added perturbations.
+a nut (interval bisection method would be sufficient for such simple task), but this approach allows 
+the simulation to be expanded arbitrarily to include other perturbations, such as wind, inhomogeneity of 
+the gravitational field, inhomogeneity of the density of the environment, bullet excentricity and so on. 
+The algorithm does not need to be changed after adding such complications, it will continue to function. 
+It is only necessary to ensure that the system does not become [chaotic](https://en.wikipedia.org/wiki/Chaos_theory) 
+with the added perturbations.
 
 In the case of the SimFire ​​application, the chromosome is represented by class **CSimFireSingleRunParams**,
 which contains information about the barrel's elevation and also summarizes statistical data about
@@ -191,3 +192,13 @@ downgraded in the project properties if necessary.
 Simulation parameters are specified in the configuration INI file. The program requires the path to this file as
 the value of the command line parameter **--setup**. Another possible command line parameter is **--help**. 
 Everything else is set in the INI file (see directory /data in the repository for examples).
+
+## Output check
+
+Test runs can be exported to a CSV file for data review (see data/sim_test_simple.ini for more information). 
+For a simple visual overview, one can use gnuplot with a pre-prepared script **showshoot.gpl** using 
+following command:
+
+´´´
+gnuplot -e "INPUTFILE='my_file.csv'" showshoot.gpl
+´´´

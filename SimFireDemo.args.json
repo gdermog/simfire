@@ -11,6 +11,10 @@
       "Command": "--setup \"w:\\\\Demos\\\\simfire\\\\data\\\\sim_test_simple.ini\""
     },
     {
+      "Id": "2f2d31e3-7351-499b-a657-79b14bb4492e",
+      "Command": "--setup \"w:\\\\Demos\\\\simfire\\\\data\\\\sim_test_simple_vacuum.ini\""
+    },
+    {
       "Id": "0e322d0e-927b-4f1e-a86d-2f6bab602d5e",
       "Command": "--setup \"w:\\\\Demos\\\\simfire\\\\data\\\\sim_test.ini\""
     }

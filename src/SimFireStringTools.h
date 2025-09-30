@@ -126,9 +126,9 @@ namespace SimFire
   template<std::size_t N>
   inline const char * format_argument_typecast( const char( &value )[N] ) noexcept { return (const char *)&value; }
 
-  inline const char * format_argument_typecast( const std::string const & value ) noexcept { return value.c_str(); }
+  inline const char * format_argument_typecast( const std::string & value ) noexcept { return value.c_str(); }
 
-  inline const wchar_t * format_argument_typecast( const std::wstring const & value ) noexcept { return value.c_str(); }
+  inline const wchar_t * format_argument_typecast( const std::wstring & value ) noexcept { return value.c_str(); }
 
   template <typename T>
   inline const char * format_argument_typecast( const T & value ) noexcept { return value; }

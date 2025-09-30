@@ -82,6 +82,7 @@
   <ItemGroup>
     <ClCompile Include="src\CSimFireConfig.cpp" />
     <ClCompile Include="src\CSimFireCore.cpp" />
+    <ClCompile Include="src\CSimFireCSVExporter.cpp" />
     <ClCompile Include="src\CSimFireSettings.cpp" />
     <ClCompile Include="src\CSimFireSingleRun.cpp" />
     <ClCompile Include="src\CSimFireSingleRunParams.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="entt\tools\davey.hpp" />
     <ClInclude Include="src\CSimFireConfig.h" />
     <ClInclude Include="src\CSimFireCore.h" />
+    <ClInclude Include="src\CSimFireCSVExporter.h" />
     <ClInclude Include="src\CSimFireSettings.h" />
     <ClInclude Include="src\CSimFireSingleRun.h" />
     <ClInclude Include="src\CSimFireSingleRunParams.h" />
@@ -177,6 +179,7 @@
   <ItemGroup>
     <None Include="data\sim_test.ini" />
     <None Include="data\sim_test_simple.ini" />
+    <None Include="data\sim_test_simple_vacuum.ini" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>

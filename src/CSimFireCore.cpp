@@ -12,6 +12,7 @@
 #include <SimFireStringTools.h>
 #include <CSimFireCore.h>
 
+
 namespace SimFire
 {
 
@@ -34,7 +35,7 @@ namespace SimFire
    bool CSimFireCore::Run()
    {
      if( mSettings.GetSeed() < 0 )
-       std::srand( std::time( {} ) );
+       std::srand( (unsigned)std::time( {} ) );
      else
        std::srand( mSettings.GetSeed() );
 
@@ -275,7 +276,7 @@ namespace SimFire
      for( auto it = runParamsBegin; it != runParamsEnd; ++it )
        it->mReturnCode = CSimFireSingleRunParams::SimResCode_t::kNotStarted;
 
-     CSimFireSingleRun runWorker( mSettings, BIND_SINGLE_RUN_LOG_CALLBACK( CSimFireCore::WriteLogMessage ) );
+     CSimFireSingleRun runWorker( mSettings, BIND_SINGLE_RUN_LOG_CALLBACK( this, CSimFireCore::WriteLogMessage ) );
 
      unsigned nr = 0;
      std::string runList;
@@ -286,8 +287,7 @@ namespace SimFire
        runList += it->mRunIdentifier;
      }
 
-     WriteLogMessage( threadId, FormatStr( "Starting a batch of %zu runs: %s", 
-         nr /*std::distance(runParamsBegin, runParamsEnd)*/, runList ));
+     WriteLogMessage( threadId, FormatStr( "Starting a batch of %zu runs: %s",  nr, runList ));
 
      for( auto it = runParamsBegin; it != runParamsEnd; ++it )
      {
