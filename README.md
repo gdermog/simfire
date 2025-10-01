@@ -1,6 +1,6 @@
 # SimFire
 
-Exercise (c++ project): Simple shooting simulator using external ballistics.
+Exercise (c++ demo project): Simple shooting simulator using external ballistics.
 
 # Basic problem description
 
@@ -115,7 +115,7 @@ Specifically, the components used are:
 
   ## Genetic algorithm - basic idea
 
-  Genetic algorithms are inb general means of heuristic search that use concepts of biological evolution, 
+  Genetic algorithms are in general means of heuristic search that use concepts of biological evolution, 
   such as natural selection and genetics, to find optimal or near-optimal solutions to complex problems. 
   They begin with a population of random candidate solutions (chromosomes), which are then iteratively improved 
   through a process of fitness evaluation, selection of the fittest, and genetic operations like crossover 
@@ -203,3 +203,20 @@ following command:
 ```
 gnuplot -e "INPUTFILE='my_file.csv'" showshoot.gpl
 ```
+
+# Work to be done
+
+There are still some tasks that need to be completed on the project, in particular:
+
+	- To suggest and implement some form of input/output testing (e.g. via some unit-test framework, possible catch2)
+	- To implement CI/CD pipelne for GitHub to automatize compile the project and unit tests and check for possible errors
+	- To fine-tune GA parameters, so the process would be able to find both solutions in one run (now it strongly
+	  depends to initial conditions)
+
+And maybe sometime in the future:
+
+	- Expanded GA sighting to 3D (now limited to shot plane and elevation angle)
+	- Shootin to moving target
+	- Add other environmental influences (wind, uncertainty in target position, etc.)
+	- ...
+	- Play with it some more, it's fun :-).
