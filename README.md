@@ -208,15 +208,15 @@ gnuplot -e "INPUTFILE='my_file.csv'" showshoot.gpl
 
 There are still some tasks that need to be completed on the project, in particular:
 
-	- To suggest and implement some form of input/output testing (e.g. via some unit-test framework, possible catch2)
-	- To implement CI/CD pipelne for GitHub to automatize compile the project and unit tests and check for possible errors
-	- To fine-tune GA parameters, so the process would be able to find both solutions in one run (now it strongly
-	  depends to initial conditions)
+   - To suggest and implement some form of input/output testing (e.g. via some unit-test framework, possible catch2)
+   - To implement CI/CD pipelne for GitHub to automatize compile the project and unit tests and check for possible errors
+   - To fine-tune GA parameters, so the process would be able to find both solutions in one run (now it strongly
+	 depends to initial conditions)
 
 And maybe sometime in the future:
 
-	- Expanded GA sighting to 3D (now limited to shot plane and elevation angle)
-	- Shootin to moving target
-	- Add other environmental influences (wind, uncertainty in target position, etc.)
-	- ...
-	- Play with it some more, it's fun :-).
+   - Expanded GA sighting to 3D (now limited to shot plane and elevation angle)
+   - Shootin to moving target
+   - Add other environmental influences (wind, uncertainty in target position, etc.)
+   - ...
+   - Play with it some more, it's fun :-).
